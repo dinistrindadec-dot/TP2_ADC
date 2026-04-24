@@ -51,6 +51,20 @@ def obter_utilizador(utilizador_id):
     return None
 
 
+def atualizar_contactos(utilizador_id, email, telefone):
+
+    email = (email or "").strip()
+    telefone = (telefone or "").strip()
+    regs = carregar_utilizadores()
+    for u in regs:
+        if u["id"] == utilizador_id:
+            u["email"] = email
+            u["telefone"] = telefone
+            _guardar_utilizadores(regs)
+            return True, "E-mail e telemóvel atualizados com sucesso."
+    return False, "Utilizador não encontrado."
+
+
 def listar_indice_formatado():
 
     regs = carregar_utilizadores()

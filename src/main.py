@@ -78,9 +78,10 @@ def menu_leitor():
         print("3. Devolver livro")
         print("4. Prazos das minhas requisições (tempo até devolução)")
         print("5. Pesquisar livros (por autor ou por tema)")
-        print("6. Voltar")
+        print("6. Atualizar e-mail ou telemóvel (contactos)")
+        print("7. Voltar")
         op = input("Opção: ").strip()
-        if op in ("1", "2", "3", "4", "5", "6"):
+        if op in ("1", "2", "3", "4", "5", "6", "7"):
             return int(op)
         print("Opção inválida.")
 
@@ -275,6 +276,40 @@ def fluxo_leitor_pesquisar():
     print(modulo_requisicoes.formatar_livros_com_disponibilidade(livros))
 
 
+def _pedir_novo_contacto(rotulo, valor_atual):
+
+    atual_txt = valor_atual if valor_atual else "—"
+    print(f"{rotulo} atual: {atual_txt}")
+    print("(Enter para manter, '-' para apagar, ou escreva o novo valor)")
+    linha = input(f"Novo {rotulo.lower()}: ").strip()
+    if linha == "":
+        return valor_atual
+    if linha == "-":
+        return ""
+    return linha
+
+
+def fluxo_leitor_contactos():
+    print("\nUtilizadores registados:")
+    print(modulo_utilizadores.listar_indice_formatado())
+    try:
+        uid = int(input("O seu id de utilizador: ").strip())
+    except ValueError:
+        print("Id inválido.")
+        return
+    u = modulo_utilizadores.obter_utilizador(uid)
+    if u is None:
+        print("Utilizador não encontrado.")
+        return
+    email = _pedir_novo_contacto("E-mail", u.get("email", ""))
+    telefone = _pedir_novo_contacto("Telemóvel", u.get("telefone", ""))
+    if email == u.get("email", "") and telefone == u.get("telefone", ""):
+        print("Nenhuma alteração.")
+        return
+    ok, msg = modulo_utilizadores.atualizar_contactos(uid, email, telefone)
+    print(msg)
+
+
 def fluxo_admin_backup():
     try:
         pasta, ficheiros = modulo_backup.criar_backup()
@@ -325,6 +360,8 @@ def painel_leitor():
             fluxo_leitor_prazos()
         elif op == 5:
             fluxo_leitor_pesquisar()
+        elif op == 6:
+            fluxo_leitor_contactos()
         else:
             break
 
