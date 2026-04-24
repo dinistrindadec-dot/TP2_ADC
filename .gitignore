@@ -1,6 +1,5 @@
 .idea
 *.pyc
+
 .venv/
 __pycache__/
-
-data/*.json

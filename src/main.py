@@ -1,6 +1,17 @@
+"""
+Aplicação de consola — Catálogo e requisições da biblioteca.
+
+Menu principal inspirado na organização modular do projeto de referência
+(`prof`): funções de menu, entrada do utilizador e chamadas aos módulos
+`modulo_catalogo` e `modulo_requisicoes`.
+
+:Autor: TP2 — Biblioteca
+"""
+
 import sys
 from pathlib import Path
 
+# Permite `python main.py` a partir de `src/` ou `python src/main.py` a partir da raiz TP2
 _SRC = Path(__file__).resolve().parent
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
@@ -10,105 +21,91 @@ import modulo_requisicoes
 
 
 def menu_principal():
-
     while True:
         print("\n--- Biblioteca ---")
         print("1. Consultar catálogo")
-        print("2. Requisitar um livro")
-        print("3. Área de administrador")
-        print("4. Sair")
+        print("2. Área de administrador")
+        print("3. Sair")
         opcao = input("Opção: ").strip()
-        if opcao in ("1", "2", "3", "4"):
+        if opcao in ("1", "2", "3"):
             return int(opcao)
-        print("Opção inválida.\n")
+        print("Opção inválida.")
 
 
 def menu_admin():
-
     while True:
         print("\n--- Administrador ---")
-        print("1. Adicionar livro ao catálogo")
+        print("1. Criar livro (atualizar catálogo)")
         print("2. Ver livros requisitados (requisições ativas)")
-        print("3. Registar devolução de um exemplar")
-        print("4. Voltar ao menu principal")
+        print("3. Voltar ao menu principal")
         opcao = input("Opção: ").strip()
-        if opcao in ("1", "2", "3", "4"):
+        if opcao in ("1", "2", "3"):
             return int(opcao)
-        print("Opção inválida.\n")
+        print("Opção inválida.")
 
 
-def _autenticar_admin():
+def consultar_catalogo():
+    livros = modulo_catalogo.listar_livros()
+    if not livros:
+        print("O catálogo está vazio.")
+        return
+    print("\nCatálogo:")
+    for livro in livros:
+        disp = modulo_requisicoes.exemplares_disponiveis(livro)
+        print(
+            f"  [{livro['id']}] {livro['titulo']} — {livro['autor']} | "
+            f"Exemplares: {livro['exemplares']} | Disponíveis: {disp}"
+        )
 
-    chave = input("Palavra-passe de administrador: ").strip()
-    if chave != "admin":
-        print("Acesso negado.")
-        return False
-    return True
+
+def admin_criar_livro():
+    titulo = input("Título: ").strip()
+    if not titulo:
+        print("Título obrigatório.")
+        return
+    autor = input("Autor: ").strip()
+    if not autor:
+        print("Autor obrigatório.")
+        return
+    raw = input("Número de exemplares: ").strip()
+    try:
+        exemplares = int(raw)
+    except ValueError:
+        print("Introduza um número inteiro válido.")
+        return
+    if exemplares < 0:
+        print("O número de exemplares não pode ser negativo.")
+        return
+    livro = modulo_catalogo.criar_livro(titulo, autor, exemplares)
+    print(f"Livro criado com id {livro['id']}. Catálogo atualizado.")
 
 
-def _pedir_inteiro_positivo(mensagem):
-    while True:
-        try:
-            n = int(input(mensagem).strip())
-            if n > 0:
-                return n
-        except ValueError:
-            pass
-        print("Introduza um número inteiro positivo.")
+def admin_ver_requisicoes():
+    linhas = modulo_requisicoes.listar_requisicoes_ativas_para_admin(
+        modulo_catalogo.obter_livro
+    )
+    if not linhas:
+        print("Não há requisições ativas.")
+        return
+    print("\nRequisições ativas (para avaliar se outros podem requisitar):")
+    for linha in linhas:
+        print(linha)
 
 
 def main():
     while True:
         op = menu_principal()
-
         if op == 1:
-            print("\nCatálogo:")
-            print(modulo_catalogo.formatar_catalogo_para_consulta())
-
+            consultar_catalogo()
         elif op == 2:
-            print("\nCatálogo:")
-            print(modulo_catalogo.formatar_catalogo_para_consulta())
-            try:
-                lid = int(input("Id do livro a requisitar: ").strip())
-            except ValueError:
-                print("Id inválido.")
-                continue
-            nome = input("O seu nome: ").strip()
-            if not nome:
-                print("O nome é obrigatório.")
-                continue
-            print(modulo_requisicoes.requisitar_livro(lid, nome))
-
-        elif op == 3:
-            if not _autenticar_admin():
-                continue
             while True:
                 oa = menu_admin()
                 if oa == 1:
-                    titulo = input("Título: ").strip()
-                    autor = input("Autor: ").strip()
-                    if not titulo or not autor:
-                        print("Título e autor são obrigatórios.")
-                        continue
-                    ex = _pedir_inteiro_positivo("Número de exemplares: ")
-                    livro = modulo_catalogo.criar_livro(titulo, autor, ex)
-                    print(
-                        f"Livro criado: id {livro['id']}, «{livro['titulo']}», "
-                        f"{livro['exemplares']} exemplar(es). Catálogo atualizado."
-                    )
+                    admin_criar_livro()
                 elif oa == 2:
-                    print("\nRequisições ativas:")
-                    print(modulo_requisicoes.listar_requisicoes_ativas())
-                elif oa == 3:
-                    try:
-                        rid = int(input("Id da requisição a encerrar (devolução): ").strip())
-                    except ValueError:
-                        print("Id inválido.")
-                        continue
-                    print(modulo_requisicoes.devolver_livro(rid))
+                    admin_ver_requisicoes()
                 else:
                     break
-
         else:
             break
 
