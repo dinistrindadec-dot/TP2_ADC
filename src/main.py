@@ -6,8 +6,8 @@ Programa principal com menus interativos para o administrador
 (criar livros, ver requisições) e para leitores (consultar catálogo,
 requisitar e devolver).
 
-Os módulos ``modulo_catalogo``, ``modulo_requisicoes`` e ``modulo_utilizadores``
-concentram a lógica de negócio e a persistência em ficheiros JSON.
+Os módulos ``modulo_catalogo``, ``modulo_requisicoes``, ``modulo_utilizadores``
+e ``modulo_backup`` concentram a lógica de negócio e a persistência em ficheiros JSON.
 
 :Autor: TP2 ADC
 :Versão: 1.0
@@ -20,6 +20,7 @@ _SRC = Path(__file__).resolve().parent
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
+import modulo_backup
 import modulo_catalogo
 import modulo_requisicoes
 import modulo_utilizadores
@@ -56,9 +57,10 @@ def menu_admin():
         print("4. Registar utilizador")
         print("5. Fichas de utilizadores")
         print("6. Stock dos livros (ver / alterar quantidade)")
-        print("7. Voltar")
+        print("7. Criar backup dos dados (cópia de segurança)")
+        print("8. Voltar")
         op = input("Opção: ").strip()
-        if op in ("1", "2", "3", "4", "5", "6", "7"):
+        if op in ("1", "2", "3", "4", "5", "6", "7", "8"):
             return int(op)
         print("Opção inválida.")
 
@@ -75,9 +77,11 @@ def menu_leitor():
         print("2. Requisitar livro")
         print("3. Devolver livro")
         print("4. Prazos das minhas requisições (tempo até devolução)")
-        print("5. Voltar")
+        print("5. Pesquisar livros (por autor ou por tema)")
+        print("6. Atualizar e-mail ou telemóvel (contactos)")
+        print("7. Voltar")
         op = input("Opção: ").strip()
-        if op in ("1", "2", "3", "4", "5"):
+        if op in ("1", "2", "3", "4", "5", "6", "7"):
             return int(op)
         print("Opção inválida.")
 
@@ -111,7 +115,8 @@ def fluxo_admin_criar_livro():
         print("Título e autor são obrigatórios.")
         return
     exemplares = _pedir_inteiro_positivo("Número de exemplares: ")
-    livro = modulo_catalogo.adicionar_livro(titulo, autor, exemplares)
+    tema = input("Tema / género (opcional, para pesquisa): ").strip()
+    livro = modulo_catalogo.adicionar_livro(titulo, autor, exemplares, tema)
     print(f"Livro criado com id {livro['id']}. Catálogo atualizado.")
 
 
@@ -251,6 +256,76 @@ def fluxo_leitor_prazos():
     print(modulo_requisicoes.prazos_minhas_requisicoes_formatado(uid))
 
 
+def fluxo_leitor_pesquisar():
+    print("\nPesquisa (texto parcial, ignora maiúsculas):")
+    print("1. Por autor")
+    print("2. Por tema")
+    op = input("Opção: ").strip()
+    termo = input("Texto a procurar: ").strip()
+    if not termo:
+        print("Indique um termo de pesquisa.")
+        return
+    if op == "1":
+        livros = modulo_catalogo.pesquisar_por_autor(termo)
+    elif op == "2":
+        livros = modulo_catalogo.pesquisar_por_tema(termo)
+    else:
+        print("Opção inválida.")
+        return
+    print("\nResultados:")
+    print(modulo_requisicoes.formatar_livros_com_disponibilidade(livros))
+
+
+def _pedir_novo_contacto(rotulo, valor_atual):
+
+    atual_txt = valor_atual if valor_atual else "—"
+    print(f"{rotulo} atual: {atual_txt}")
+    print("(Enter para manter, '-' para apagar, ou escreva o novo valor)")
+    linha = input(f"Novo {rotulo.lower()}: ").strip()
+    if linha == "":
+        return valor_atual
+    if linha == "-":
+        return ""
+    return linha
+
+
+def fluxo_leitor_contactos():
+    print("\nUtilizadores registados:")
+    print(modulo_utilizadores.listar_indice_formatado())
+    try:
+        uid = int(input("O seu id de utilizador: ").strip())
+    except ValueError:
+        print("Id inválido.")
+        return
+    u = modulo_utilizadores.obter_utilizador(uid)
+    if u is None:
+        print("Utilizador não encontrado.")
+        return
+    email = _pedir_novo_contacto("E-mail", u.get("email", ""))
+    telefone = _pedir_novo_contacto("Telemóvel", u.get("telefone", ""))
+    if email == u.get("email", "") and telefone == u.get("telefone", ""):
+        print("Nenhuma alteração.")
+        return
+    ok, msg = modulo_utilizadores.atualizar_contactos(uid, email, telefone)
+    print(msg)
+
+
+def fluxo_admin_backup():
+    try:
+        pasta, ficheiros = modulo_backup.criar_backup()
+    except OSError as e:
+        print(f"Não foi possível criar o backup: {e}")
+        return
+    if not ficheiros:
+        print(
+            "Não foi copiado nenhum ficheiro (ainda não existem dados em "
+            "livros.json, requisicoes.json ou utilizadores.json)."
+        )
+        return
+    print(f"Backup criado com sucesso em:\n  {pasta}")
+    print(f"Ficheiros copiados: {', '.join(ficheiros)}")
+
+
 def painel_admin():
     while True:
         op = menu_admin()
@@ -266,6 +341,8 @@ def painel_admin():
             fluxo_admin_fichas()
         elif op == 6:
             fluxo_admin_stock()
+        elif op == 7:
+            fluxo_admin_backup()
         else:
             break
 
@@ -281,6 +358,10 @@ def painel_leitor():
             fluxo_leitor_devolver()
         elif op == 4:
             fluxo_leitor_prazos()
+        elif op == 5:
+            fluxo_leitor_pesquisar()
+        elif op == 6:
+            fluxo_leitor_contactos()
         else:
             break
 

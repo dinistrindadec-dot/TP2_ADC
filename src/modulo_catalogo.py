@@ -21,7 +21,7 @@ def carregar_livros():
     """
     Carrega todos os livros do ficheiro de dados.
 
-    :return: Lista de dicionários com chaves id, titulo, autor, exemplares
+    :return: Lista de dicionários com id, titulo, autor, exemplares e opcionalmente tema
     :rtype: list[dict]
     """
     _garantir_ficheiro()
@@ -38,13 +38,14 @@ def _proximo_id(livros):
     return max(l["id"] for l in livros) + 1
 
 
-def adicionar_livro(titulo, autor, exemplares):
+def adicionar_livro(titulo, autor, exemplares, tema=""):
     """
     Regista um novo livro no catálogo.
 
     :param titulo: Título do livro
     :param autor: Nome do autor
     :param exemplares: Número de exemplares físicos (>= 1)
+    :param tema: Tema ou género (opcional), usado na pesquisa
     :return: O dicionário do livro criado
     :rtype: dict
     """
@@ -54,10 +55,35 @@ def adicionar_livro(titulo, autor, exemplares):
         "titulo": titulo.strip(),
         "autor": autor.strip(),
         "exemplares": int(exemplares),
+        "tema": (tema or "").strip(),
     }
     livros.append(livro)
     _guardar_livros(livros)
     return livro
+
+
+def pesquisar_por_autor(termo):
+
+    termo = termo.strip().lower()
+    if not termo:
+        return []
+    return [
+        livro
+        for livro in carregar_livros()
+        if termo in livro.get("autor", "").lower()
+    ]
+
+
+def pesquisar_por_tema(termo):
+
+    termo = termo.strip().lower()
+    if not termo:
+        return []
+    return [
+        livro
+        for livro in carregar_livros()
+        if termo in livro.get("tema", "").lower()
+    ]
 
 
 def obter_livro(livro_id):
@@ -100,8 +126,10 @@ def listar_catalogo_formatado():
         return "(Catálogo vazio — ainda não existem livros registados.)"
     linhas = []
     for livro in livros:
+        tema = livro.get("tema", "").strip()
+        extra = f" | Tema: {tema}" if tema else ""
         linhas.append(
-            f"  [{livro['id']}] {livro['titulo']} — {livro['autor']} "
+            f"  [{livro['id']}] {livro['titulo']} — {livro['autor']}{extra} "
             f"({livro['exemplares']} exemplar(es) no total)"
         )
     return "\n".join(linhas)
