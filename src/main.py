@@ -71,12 +71,13 @@ def menu_leitor():
     """
     while True:
         print("\n--- Leitor ---")
-        print("1. Consultar catálogo")
+        print("1. Consultar catálogo (disponível / emprestado)")
         print("2. Requisitar livro")
         print("3. Devolver livro")
-        print("4. Voltar")
+        print("4. Prazos das minhas requisições (tempo até devolução)")
+        print("5. Voltar")
         op = input("Opção: ").strip()
-        if op in ("1", "2", "3", "4"):
+        if op in ("1", "2", "3", "4", "5"):
             return int(op)
         print("Opção inválida.")
 
@@ -182,7 +183,8 @@ def fluxo_admin_stock():
 
 
 def fluxo_leitor_catalogo():
-    fluxo_admin_catalogo()
+    print("\nCatálogo com disponibilidade para requisição:")
+    print(modulo_requisicoes.catalogo_disponibilidade_formatado())
 
 
 def fluxo_leitor_requisitar():
@@ -196,8 +198,8 @@ def fluxo_leitor_requisitar():
     if modulo_utilizadores.obter_utilizador(uid) is None:
         print("Utilizador não encontrado.")
         return
-    print("\nCatálogo:")
-    print(modulo_catalogo.listar_catalogo_formatado())
+    print("\nDisponibilidade:")
+    print(modulo_requisicoes.catalogo_disponibilidade_formatado())
     try:
         lid = int(input("Id do livro a requisitar: ").strip())
     except ValueError:
@@ -234,6 +236,21 @@ def fluxo_leitor_devolver():
     print(msg)
 
 
+def fluxo_leitor_prazos():
+    print("\nUtilizadores registados:")
+    print(modulo_utilizadores.listar_indice_formatado())
+    try:
+        uid = int(input("O seu id de utilizador: ").strip())
+    except ValueError:
+        print("Id inválido.")
+        return
+    if modulo_utilizadores.obter_utilizador(uid) is None:
+        print("Utilizador não encontrado.")
+        return
+    print("\nAs suas requisições ativas e tempo até à devolução:")
+    print(modulo_requisicoes.prazos_minhas_requisicoes_formatado(uid))
+
+
 def painel_admin():
     while True:
         op = menu_admin()
@@ -262,6 +279,8 @@ def painel_leitor():
             fluxo_leitor_requisitar()
         elif op == 3:
             fluxo_leitor_devolver()
+        elif op == 4:
+            fluxo_leitor_prazos()
         else:
             break
 
