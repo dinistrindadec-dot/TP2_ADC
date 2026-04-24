@@ -7,3 +7,4 @@ __pycache__/
 # Dados geridos pela aplicação (criados em runtime)
 data/livros.json
 data/requisicoes.json
+data/utilizadores.json

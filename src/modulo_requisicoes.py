@@ -23,7 +23,7 @@ def carregar_requisicoes():
     """
     Carrega todas as requisições.
 
-    :return: Lista de dicionários com id, livro_id, requisitante, ativa
+    :return: Lista de dicionários com id, livro_id, utilizador_id, requisitante, ativa
     :rtype: list[dict]
     """
     _garantir_ficheiro()
@@ -69,15 +69,21 @@ def exemplares_disponiveis(livro_id):
     return max(0, livro["exemplares"] - em_uso)
 
 
-def requisitar(livro_id, nome_requisitante):
+def requisitar(livro_id, utilizador_id):
     """
     Cria uma requisição ativa se houver exemplar disponível.
 
     :param livro_id: Identificador do livro
-    :param nome_requisitante: Nome de quem requisita
+    :param utilizador_id: Identificador do utilizador registado
     :return: Tupla (sucesso: bool, mensagem: str, requisicao ou None)
     :rtype: tuple[bool, str, dict | None]
     """
+    import modulo_utilizadores
+
+    utilizador = modulo_utilizadores.obter_utilizador(utilizador_id)
+    if utilizador is None:
+        return False, "Utilizador não encontrado. Peça ao administrador o registo.", None
+
     livro = modulo_catalogo.obter_livro(livro_id)
     if livro is None:
         return False, "Livro não encontrado.", None
@@ -87,7 +93,8 @@ def requisitar(livro_id, nome_requisitante):
     reg = {
         "id": _proximo_id(regs),
         "livro_id": livro_id,
-        "requisitante": nome_requisitante.strip(),
+        "utilizador_id": utilizador_id,
+        "requisitante": utilizador["nome"],
         "ativa": True,
     }
     regs.append(reg)
@@ -138,23 +145,79 @@ def listar_requisitadas_admin():
     return "\n".join(linhas)
 
 
-def listar_por_requisitante(nome):
+def requisicao_pertence_a_utilizador(reg, utilizador_id):
     """
-    Lista requisições ativas de um requisitante (para escolher devolução).
+    Verifica se a requisição pertence ao utilizador (por id ou legado por nome).
+    """
+    uid = reg.get("utilizador_id")
+    if uid is not None:
+        return uid == utilizador_id
+    import modulo_utilizadores
+
+    u = modulo_utilizadores.obter_utilizador(utilizador_id)
+    if u is None:
+        return False
+    return reg.get("requisitante", "").strip().lower() == u["nome"].strip().lower()
+
+
+def listar_por_utilizador(utilizador_id):
+    """
+    Lista requisições ativas de um utilizador (para escolher devolução).
 
     :rtype: str
     """
-    nome = nome.strip().lower()
     ativas = [
         r
         for r in carregar_requisicoes()
-        if r["ativa"] and r["requisitante"].strip().lower() == nome
+        if r["ativa"] and requisicao_pertence_a_utilizador(r, utilizador_id)
     ]
     if not ativas:
-        return "(Sem requisições ativas com esse nome.)"
+        return "(Sem requisições ativas para este utilizador.)"
     linhas = []
     for r in ativas:
         livro = modulo_catalogo.obter_livro(r["livro_id"])
         titulo = livro["titulo"] if livro else "?"
         linhas.append(f"  [#{r['id']}] «{titulo}»")
+    return "\n".join(linhas)
+
+
+def resumo_requisicoes_utilizador(utilizador_id):
+    """
+    Texto com totais e histórico recente de requisições do utilizador.
+
+    :rtype: str
+    """
+    regs = carregar_requisicoes()
+    todas = [r for r in regs if requisicao_pertence_a_utilizador(r, utilizador_id)]
+    ativas = [r for r in todas if r["ativa"]]
+    concluidas = [r for r in todas if not r["ativa"]]
+
+    linhas = [
+        f"    Requisições ativas: {len(ativas)}",
+        f"    Requisições concluídas (histórico): {len(concluidas)}",
+    ]
+    if ativas:
+        linhas.append("    Em requisição:")
+        for r in ativas:
+            livro = modulo_catalogo.obter_livro(r["livro_id"])
+            tit = livro["titulo"] if livro else "?"
+            linhas.append(f"      — «{tit}» (#{r['id']})")
+    return "\n".join(linhas)
+
+
+def listar_stock_por_livro_formatado():
+
+    livros = modulo_catalogo.carregar_livros()
+    if not livros:
+        return "(Sem livros no catálogo.)"
+    linhas = []
+    for livro in livros:
+        lid = livro["id"]
+        total = livro["exemplares"]
+        em_req = contar_requisicoes_ativas_por_livro(lid)
+        disp = max(0, total - em_req)
+        linhas.append(
+            f"  [{lid}] «{livro['titulo']}»\n"
+            f"      Stock total: {total} | Em requisição: {em_req} | Disponível: {disp}"
+        )
     return "\n".join(linhas)

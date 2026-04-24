@@ -14,8 +14,10 @@ Na raiz do projeto ``TP2``::
 Funcionalidades
 ---------------
 
-* **Administrador**: criar livros (atualiza o catálogo persistente) e consultar
-  requisições ativas (para saber quantos exemplares ainda podem ser requisitados).
-* **Leitor**: consultar o catálogo, requisitar exemplares disponíveis e registar devoluções.
+* **Administrador**: criar livros; consultar requisições ativas; registar utilizadores;
+  consultar **fichas** de utilizadores (dados e resumo de requisições); ver e **ajustar o stock**
+  (exemplares totais por livro, respeitando o que está em requisição).
+* **Leitor**: consultar o catálogo; requisitar e devolver com o **id de utilizador** (tem de
+  estar registado pelo administrador).
 
 Os dados são guardados em JSON na pasta ``data/`` (criada automaticamente).

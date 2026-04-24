@@ -74,6 +74,20 @@ def obter_livro(livro_id):
     return None
 
 
+def atualizar_exemplares(livro_id, novo_total):
+
+    novo_total = int(novo_total)
+    if novo_total < 1:
+        return False, "O stock total tem de ser pelo menos 1."
+    livros = carregar_livros()
+    for livro in livros:
+        if livro["id"] == livro_id:
+            livro["exemplares"] = novo_total
+            _guardar_livros(livros)
+            return True, "Stock atualizado."
+    return False, "Livro não encontrado."
+
+
 def listar_catalogo_formatado():
     """
     Devolve linhas de texto com o catálogo completo para apresentação na consola.

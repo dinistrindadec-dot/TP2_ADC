@@ -6,8 +6,8 @@ Programa principal com menus interativos para o administrador
 (criar livros, ver requisições) e para leitores (consultar catálogo,
 requisitar e devolver).
 
-Os módulos ``modulo_catalogo`` e ``modulo_requisicoes`` concentram a lógica
-de negócio e a persistência em ficheiros JSON.
+Os módulos ``modulo_catalogo``, ``modulo_requisicoes`` e ``modulo_utilizadores``
+concentram a lógica de negócio e a persistência em ficheiros JSON.
 
 :Autor: TP2 ADC
 :Versão: 1.0
@@ -22,6 +22,7 @@ if str(_SRC) not in sys.path:
 
 import modulo_catalogo
 import modulo_requisicoes
+import modulo_utilizadores
 
 
 def menu_principal():
@@ -52,9 +53,12 @@ def menu_admin():
         print("1. Criar livro (atualizar catálogo)")
         print("2. Ver livros requisitados (requisições ativas)")
         print("3. Consultar catálogo completo")
-        print("4. Voltar")
+        print("4. Registar utilizador")
+        print("5. Fichas de utilizadores")
+        print("6. Stock dos livros (ver / alterar quantidade)")
+        print("7. Voltar")
         op = input("Opção: ").strip()
-        if op in ("1", "2", "3", "4"):
+        if op in ("1", "2", "3", "4", "5", "6", "7"):
             return int(op)
         print("Opção inválida.")
 
@@ -88,6 +92,17 @@ def _pedir_inteiro_positivo(mensagem):
         print("Introduza um número inteiro >= 1.")
 
 
+def _pedir_inteiro_minimo(mensagem, minimo):
+    while True:
+        try:
+            v = int(input(mensagem).strip())
+            if v >= minimo:
+                return v
+        except ValueError:
+            pass
+        print(f"Introduza um número inteiro >= {minimo}.")
+
+
 def fluxo_admin_criar_livro():
     titulo = input("Título: ").strip()
     autor = input("Autor: ").strip()
@@ -109,11 +124,78 @@ def fluxo_admin_catalogo():
     print(modulo_catalogo.listar_catalogo_formatado())
 
 
+def fluxo_admin_registar_utilizador():
+    nome = input("Nome completo: ").strip()
+    if not nome:
+        print("O nome é obrigatório.")
+        return
+    email = input("E-mail (opcional): ").strip()
+    telefone = input("Telefone (opcional): ").strip()
+    try:
+        u = modulo_utilizadores.adicionar_utilizador(nome, email, telefone)
+        print(f"Utilizador registado com id {u['id']}.")
+    except ValueError as e:
+        print(str(e))
+
+
+def fluxo_admin_fichas():
+    print("\nUtilizadores:")
+    print(modulo_utilizadores.listar_indice_formatado())
+    try:
+        uid = int(input("Id do utilizador para ver a ficha: ").strip())
+    except ValueError:
+        print("Id inválido.")
+        return
+    print()
+    print(modulo_utilizadores.ficha_formatada(uid))
+
+
+def fluxo_admin_stock():
+    while True:
+        print("\nStock por livro (total | em requisição | disponível):")
+        print(modulo_requisicoes.listar_stock_por_livro_formatado())
+        print("1. Alterar stock (número de exemplares) de um livro")
+        print("2. Voltar")
+        op = input("Opção: ").strip()
+        if op == "2":
+            break
+        if op != "1":
+            print("Opção inválida.")
+            continue
+        try:
+            lid = int(input("Id do livro: ").strip())
+        except ValueError:
+            print("Id inválido.")
+            continue
+        if modulo_catalogo.obter_livro(lid) is None:
+            print("Livro não encontrado.")
+            continue
+        em_uso = modulo_requisicoes.contar_requisicoes_ativas_por_livro(lid)
+        minimo = max(1, em_uso)
+        print(
+            f"Novo total de exemplares (não pode ser inferior a {minimo}, "
+            f"porque {em_uso} estão em requisição)."
+        )
+        novo = _pedir_inteiro_minimo("Novo stock total: ", minimo)
+        ok, msg = modulo_catalogo.atualizar_exemplares(lid, novo)
+        print(msg)
+
+
 def fluxo_leitor_catalogo():
     fluxo_admin_catalogo()
 
 
 def fluxo_leitor_requisitar():
+    print("\nUtilizadores registados:")
+    print(modulo_utilizadores.listar_indice_formatado())
+    try:
+        uid = int(input("O seu id de utilizador: ").strip())
+    except ValueError:
+        print("Id inválido.")
+        return
+    if modulo_utilizadores.obter_utilizador(uid) is None:
+        print("Utilizador não encontrado.")
+        return
     print("\nCatálogo:")
     print(modulo_catalogo.listar_catalogo_formatado())
     try:
@@ -121,20 +203,23 @@ def fluxo_leitor_requisitar():
     except ValueError:
         print("Id inválido.")
         return
-    nome = input("O seu nome: ").strip()
-    if not nome:
-        print("Nome é obrigatório.")
-        return
-    ok, msg, _ = modulo_requisicoes.requisitar(lid, nome)
+    ok, msg, _ = modulo_requisicoes.requisitar(lid, uid)
     print(msg)
 
 
 def fluxo_leitor_devolver():
-    nome = input("O seu nome (como na requisição): ").strip()
-    if not nome:
+    print("\nUtilizadores registados:")
+    print(modulo_utilizadores.listar_indice_formatado())
+    try:
+        uid = int(input("O seu id de utilizador: ").strip())
+    except ValueError:
+        print("Id inválido.")
+        return
+    if modulo_utilizadores.obter_utilizador(uid) is None:
+        print("Utilizador não encontrado.")
         return
     print("\nAs suas requisições ativas:")
-    print(modulo_requisicoes.listar_por_requisitante(nome))
+    print(modulo_requisicoes.listar_por_utilizador(uid))
     try:
         rid = int(input("Número da requisição a devolver (#id): ").strip())
     except ValueError:
@@ -142,8 +227,8 @@ def fluxo_leitor_devolver():
         return
     regs = modulo_requisicoes.carregar_requisicoes()
     reg = next((x for x in regs if x["id"] == rid), None)
-    if reg is None or reg["requisitante"].strip().lower() != nome.strip().lower():
-        print("Essa requisição não existe ou não está associada ao nome indicado.")
+    if reg is None or not modulo_requisicoes.requisicao_pertence_a_utilizador(reg, uid):
+        print("Essa requisição não existe ou não pertence a este utilizador.")
         return
     ok, msg = modulo_requisicoes.devolver(rid)
     print(msg)
@@ -158,6 +243,12 @@ def painel_admin():
             fluxo_admin_ver_requisitados()
         elif op == 3:
             fluxo_admin_catalogo()
+        elif op == 4:
+            fluxo_admin_registar_utilizador()
+        elif op == 5:
+            fluxo_admin_fichas()
+        elif op == 6:
+            fluxo_admin_stock()
         else:
             break
 
