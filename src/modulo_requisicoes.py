@@ -79,26 +79,41 @@ def texto_tempo_restante_devolucao(data_limite_iso):
     return f"Em atraso há {abs(delta)} dia(s). Limite era {limite_pt}."
 
 
+def _linha_livro_com_disponibilidade(livro):
+    """
+    Uma entrada de catálogo com estado de disponibilidade (e tema, se existir).
+
+    :rtype: str
+    """
+    lid = livro["id"]
+    disp = exemplares_disponiveis(lid)
+    total = livro["exemplares"]
+    if disp > 0:
+        estado = f"Disponível — {disp} exemplar(es) livre(s) (de {total})"
+    elif total == 0:
+        estado = "Sem exemplares no stock"
+    else:
+        estado = f"Emprestado — os {total} exemplar(es) estão requisitados"
+    tema = livro.get("tema", "").strip()
+    extra_tema = f" | Tema: {tema}" if tema else ""
+    return (
+        f"  [{lid}] «{livro['titulo']}» — {livro['autor']}{extra_tema}\n      {estado}"
+    )
+
+
 def catalogo_disponibilidade_formatado():
 
     livros = modulo_catalogo.carregar_livros()
     if not livros:
         return "(Catálogo vazio — ainda não existem livros registados.)"
-    linhas = []
-    for livro in livros:
-        lid = livro["id"]
-        disp = exemplares_disponiveis(lid)
-        total = livro["exemplares"]
-        if disp > 0:
-            estado = f"Disponível — {disp} exemplar(es) livre(s) (de {total})"
-        elif total == 0:
-            estado = "Sem exemplares no stock"
-        else:
-            estado = f"Emprestado — os {total} exemplar(es) estão requisitados"
-        linhas.append(
-            f"  [{lid}] «{livro['titulo']}» — {livro['autor']}\n      {estado}"
-        )
-    return "\n".join(linhas)
+    return "\n".join(_linha_livro_com_disponibilidade(livro) for livro in livros)
+
+
+def formatar_livros_com_disponibilidade(livros):
+
+    if not livros:
+        return "(Nenhum livro corresponde à pesquisa.)"
+    return "\n".join(_linha_livro_com_disponibilidade(livro) for livro in livros)
 
 
 def exemplares_disponiveis(livro_id):
