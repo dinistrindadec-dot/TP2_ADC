@@ -16,6 +16,8 @@ e ``modulo_backup`` concentram a lógica de negócio e a persistência em fichei
 import sys
 from pathlib import Path
 
+# Garante que `src/` está no `sys.path` quando o programa é executado
+# diretamente, permitindo `import modulo_*` sem instalar o projeto como pacote.
 _SRC = Path(__file__).resolve().parent
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
@@ -30,7 +32,10 @@ def menu_principal():
     """
     Menu inicial: escolha do perfil.
 
-    :rtype: int
+    O ciclo repete até receber uma opção válida.
+
+    Returns:
+        int: 1 (administrador), 2 (leitor) ou 3 (sair).
     """
     while True:
         print("\n--- Biblioteca ---")
@@ -47,7 +52,8 @@ def menu_admin():
     """
     Menu do administrador.
 
-    :rtype: int
+    Returns:
+    int: Opção selecionada (1..8).
     """
     while True:
         print("\n--- Administrador ---")
@@ -69,7 +75,8 @@ def menu_leitor():
     """
     Menu do leitor.
 
-    :rtype: int
+    Returns:
+        int: Opção selecionada (1..7).
     """
     while True:
         print("\n--- Leitor ---")
