@@ -94,6 +94,14 @@ def menu_leitor():
 
 
 def _pedir_inteiro_positivo(mensagem):
+    """Pede um inteiro ao utilizador e valida que é >= 1.
+
+    Args:
+        mensagem (str): Texto a apresentar no `input()`.
+
+    Returns:
+        int: Inteiro validado (>= 1).
+    """
     while True:
         try:
             v = int(input(mensagem).strip())
@@ -105,6 +113,15 @@ def _pedir_inteiro_positivo(mensagem):
 
 
 def _pedir_inteiro_minimo(mensagem, minimo):
+    """Pede um inteiro ao utilizador e valida que é >= `minimo`.
+
+    Args:
+        mensagem (str): Texto a apresentar no `input()`.
+        minimo (int): Valor mínimo aceite.
+
+    Returns:
+        int: Inteiro validado (>= `minimo`).
+    """
     while True:
         try:
             v = int(input(mensagem).strip())
@@ -284,7 +301,20 @@ def fluxo_leitor_pesquisar():
 
 
 def _pedir_novo_contacto(rotulo, valor_atual):
+    """Pede ao utilizador um novo valor para um campo de contacto.
 
+    Regras:
+    - Enter mantém o valor atual.
+    - `-` apaga o valor.
+    - Qualquer outro texto substitui o valor.
+
+    Args:
+        rotulo (str): Nome a apresentar (ex.: "E-mail").
+        valor_atual (str): Valor atual do campo.
+
+    Returns:
+        str: Novo valor (pode ser vazio para representar remoção).
+    """
     atual_txt = valor_atual if valor_atual else "—"
     print(f"{rotulo} atual: {atual_txt}")
     print("(Enter para manter, '-' para apagar, ou escreva o novo valor)")
