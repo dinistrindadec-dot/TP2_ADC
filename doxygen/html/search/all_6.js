@@ -1,5 +1,8 @@
 var searchData=
 [
-  ['html_5fstatic_5fpath_0',['html_static_path',['../namespaceconf.html#af4fb5d8851ccaade135c2668dd3ced41',1,'conf']]],
-  ['html_5ftheme_1',['html_theme',['../namespaceconf.html#a012ba9863b958ed7baa933116f2a05b6',1,'conf']]]
+  ['listar_5fcatalogo_5fformatado_0',['listar_catalogo_formatado',['../namespacemodulo__catalogo.html#a0c5d2ebced0615ce9786b036510a9934',1,'modulo_catalogo']]],
+  ['listar_5findice_5fformatado_1',['listar_indice_formatado',['../namespacemodulo__utilizadores.html#a7f3d03e0374ad6e02aa39b7876eda824',1,'modulo_utilizadores']]],
+  ['listar_5fpor_5futilizador_2',['listar_por_utilizador',['../namespacemodulo__requisicoes.html#af5870d0c7b0267f08fc65462c4892ed3',1,'modulo_requisicoes']]],
+  ['listar_5frequisitadas_5fadmin_3',['listar_requisitadas_admin',['../namespacemodulo__requisicoes.html#a2df042c4af1c49efa71386cc7097fcbf',1,'modulo_requisicoes']]],
+  ['listar_5fstock_5fpor_5flivro_5fformatado_4',['listar_stock_por_livro_formatado',['../namespacemodulo__requisicoes.html#af084154a90e0d2bb65831cc841551458',1,'modulo_requisicoes']]]
 ];

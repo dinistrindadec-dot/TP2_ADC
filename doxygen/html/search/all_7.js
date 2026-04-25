@@ -1,9 +1,16 @@
 var searchData=
 [
-  ['language_0',['language',['../namespaceconf.html#ab6542454bc5925b7e6e5bb075315570d',1,'conf']]],
-  ['listar_5fcatalogo_5fformatado_1',['listar_catalogo_formatado',['../namespacemodulo__catalogo.html#a0c5d2ebced0615ce9786b036510a9934',1,'modulo_catalogo']]],
-  ['listar_5findice_5fformatado_2',['listar_indice_formatado',['../namespacemodulo__utilizadores.html#a7f3d03e0374ad6e02aa39b7876eda824',1,'modulo_utilizadores']]],
-  ['listar_5fpor_5futilizador_3',['listar_por_utilizador',['../namespacemodulo__requisicoes.html#af5870d0c7b0267f08fc65462c4892ed3',1,'modulo_requisicoes']]],
-  ['listar_5frequisitadas_5fadmin_4',['listar_requisitadas_admin',['../namespacemodulo__requisicoes.html#a2df042c4af1c49efa71386cc7097fcbf',1,'modulo_requisicoes']]],
-  ['listar_5fstock_5fpor_5flivro_5fformatado_5',['listar_stock_por_livro_formatado',['../namespacemodulo__requisicoes.html#af084154a90e0d2bb65831cc841551458',1,'modulo_requisicoes']]]
+  ['main_0',['main',['../namespacemain.html',1,'main'],['../namespacemain.html#a3140e9a5b6a71ffbf498198cfc471b88',1,'main.main()']]],
+  ['main_2epy_1',['main.py',['../main_8py.html',1,'']]],
+  ['menu_5fadmin_2',['menu_admin',['../namespacemain.html#a4fbce9b2c80d9d9bb5f0a457c47fb601',1,'main']]],
+  ['menu_5fleitor_3',['menu_leitor',['../namespacemain.html#a1fac7ce2b00e61eeaccb0519911fa595',1,'main']]],
+  ['menu_5fprincipal_4',['menu_principal',['../namespacemain.html#a7ed71e230ea9c4cc83e499cb5f38c9e7',1,'main']]],
+  ['modulo_5fbackup_5',['modulo_backup',['../namespacemodulo__backup.html',1,'']]],
+  ['modulo_5fbackup_2epy_6',['modulo_backup.py',['../modulo__backup_8py.html',1,'']]],
+  ['modulo_5fcatalogo_7',['modulo_catalogo',['../namespacemodulo__catalogo.html',1,'']]],
+  ['modulo_5fcatalogo_2epy_8',['modulo_catalogo.py',['../modulo__catalogo_8py.html',1,'']]],
+  ['modulo_5frequisicoes_9',['modulo_requisicoes',['../namespacemodulo__requisicoes.html',1,'']]],
+  ['modulo_5frequisicoes_2epy_10',['modulo_requisicoes.py',['../modulo__requisicoes_8py.html',1,'']]],
+  ['modulo_5futilizadores_11',['modulo_utilizadores',['../namespacemodulo__utilizadores.html',1,'']]],
+  ['modulo_5futilizadores_2epy_12',['modulo_utilizadores.py',['../modulo__utilizadores_8py.html',1,'']]]
 ];
