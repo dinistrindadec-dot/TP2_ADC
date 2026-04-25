@@ -1,0 +1,237 @@
+\doxysection{Referência ao namespace modulo\+\_\+requisicoes}
+\hypertarget{namespacemodulo__requisicoes}{}\label{namespacemodulo__requisicoes}\index{modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection*{Funções}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_a429069512b5758d883f143554a1a607e}{\+\_\+garantir\+\_\+ficheiro}} ()
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_a07e2826a68c5f729297af8d6d716e5de}{carregar\+\_\+requisicoes}} ()
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_aa448623c095f5f0a5d366f2b8adc59ec}{\+\_\+guardar\+\_\+requisicoes}} (regs)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_a0f8446a24d34c18dd3f5c930a6366876}{\+\_\+proximo\+\_\+id}} (regs)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_a8a3043239f039d2a60c1365c1b7a6ca7}{contar\+\_\+requisicoes\+\_\+ativas\+\_\+por\+\_\+livro}} (livro\+\_\+id)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_aeb2a4599aad9a6952f335ac3ff87d171}{texto\+\_\+tempo\+\_\+restante\+\_\+devolucao}} (data\+\_\+limite\+\_\+iso)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_a57051bac0b32a2b61875930af29b0826}{\+\_\+linha\+\_\+livro\+\_\+com\+\_\+disponibilidade}} (livro)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_ac600661763dff5fd829a1374bbe3ccdf}{catalogo\+\_\+disponibilidade\+\_\+formatado}} ()
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_a089104653569edccff633f0bd9e48285}{formatar\+\_\+livros\+\_\+com\+\_\+disponibilidade}} (livros)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_a1d61e4b389cb2687615a42cec12ff28f}{exemplares\+\_\+disponiveis}} (livro\+\_\+id)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_a64253ae5dd92a5d07be0245f0d370594}{requisitar}} (livro\+\_\+id, utilizador\+\_\+id)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_ab72d824b66a6bf981d2a59374b7b22c8}{devolver}} (requisicao\+\_\+id)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_a2df042c4af1c49efa71386cc7097fcbf}{listar\+\_\+requisitadas\+\_\+admin}} ()
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_a31b1c0b004fc35bbb31db0749821d0ec}{requisicao\+\_\+pertence\+\_\+a\+\_\+utilizador}} (reg, utilizador\+\_\+id)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_a11fb121e88a64928a2e9e21d1a337c2c}{prazos\+\_\+minhas\+\_\+requisicoes\+\_\+formatado}} (utilizador\+\_\+id)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_af5870d0c7b0267f08fc65462c4892ed3}{listar\+\_\+por\+\_\+utilizador}} (utilizador\+\_\+id)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_af0c802764a5c2e2ddc84b26aa210512d}{resumo\+\_\+requisicoes\+\_\+utilizador}} (utilizador\+\_\+id)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__requisicoes_af084154a90e0d2bb65831cc841551458}{listar\+\_\+stock\+\_\+por\+\_\+livro\+\_\+formatado}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variáveis}
+\begin{DoxyCompactItemize}
+\item 
+str \doxymbox{\hyperlink{namespacemodulo__requisicoes_ac8600e6352b6815965ca7519267ab6d4}{\+\_\+\+DADOS}} = Path(\+\_\+\+\_\+file\+\_\+\+\_\+).resolve().parent.\+parent /\+ "{}data"{} /\+ "{}requisicoes.\+json"{}
+\item 
+int \doxymbox{\hyperlink{namespacemodulo__requisicoes_ab7608d28663356da6c830cade19c6c64}{DIAS\+\_\+\+PRAZO\+\_\+\+EMPRESTIMO}} = 14
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Descrição detalhada}
+\begin{DoxyVerb}Requisições de exemplares da biblioteca.
+
+Permite requisitar e devolver livros, e listar requisições ativas para o
+administrador avaliar disponibilidade para novos requisitantes.
+\end{DoxyVerb}
+ 
+
+\label{doc-func-members}
+\Hypertarget{namespacemodulo__requisicoes_doc-func-members}
+\doxysubsection{Documentação das funções}
+\Hypertarget{namespacemodulo__requisicoes_a429069512b5758d883f143554a1a607e}\index{modulo\_requisicoes@{modulo\_requisicoes}!\_garantir\_ficheiro@{\_garantir\_ficheiro}}
+\index{\_garantir\_ficheiro@{\_garantir\_ficheiro}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{\_garantir\_ficheiro()}{\_garantir\_ficheiro()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_a429069512b5758d883f143554a1a607e} 
+modulo\+\_\+requisicoes.\+\_\+garantir\+\_\+ficheiro (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\Hypertarget{namespacemodulo__requisicoes_aa448623c095f5f0a5d366f2b8adc59ec}\index{modulo\_requisicoes@{modulo\_requisicoes}!\_guardar\_requisicoes@{\_guardar\_requisicoes}}
+\index{\_guardar\_requisicoes@{\_guardar\_requisicoes}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{\_guardar\_requisicoes()}{\_guardar\_requisicoes()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_aa448623c095f5f0a5d366f2b8adc59ec} 
+modulo\+\_\+requisicoes.\+\_\+guardar\+\_\+requisicoes (\begin{DoxyParamCaption}\item[{}]{regs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\Hypertarget{namespacemodulo__requisicoes_a57051bac0b32a2b61875930af29b0826}\index{modulo\_requisicoes@{modulo\_requisicoes}!\_linha\_livro\_com\_disponibilidade@{\_linha\_livro\_com\_disponibilidade}}
+\index{\_linha\_livro\_com\_disponibilidade@{\_linha\_livro\_com\_disponibilidade}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{\_linha\_livro\_com\_disponibilidade()}{\_linha\_livro\_com\_disponibilidade()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_a57051bac0b32a2b61875930af29b0826} 
+modulo\+\_\+requisicoes.\+\_\+linha\+\_\+livro\+\_\+com\+\_\+disponibilidade (\begin{DoxyParamCaption}\item[{}]{livro}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Uma entrada de catálogo com estado de disponibilidade (e tema, se existir).
+
+:rtype: str
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__requisicoes_a0f8446a24d34c18dd3f5c930a6366876}\index{modulo\_requisicoes@{modulo\_requisicoes}!\_proximo\_id@{\_proximo\_id}}
+\index{\_proximo\_id@{\_proximo\_id}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{\_proximo\_id()}{\_proximo\_id()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_a0f8446a24d34c18dd3f5c930a6366876} 
+modulo\+\_\+requisicoes.\+\_\+proximo\+\_\+id (\begin{DoxyParamCaption}\item[{}]{regs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\Hypertarget{namespacemodulo__requisicoes_a07e2826a68c5f729297af8d6d716e5de}\index{modulo\_requisicoes@{modulo\_requisicoes}!carregar\_requisicoes@{carregar\_requisicoes}}
+\index{carregar\_requisicoes@{carregar\_requisicoes}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{carregar\_requisicoes()}{carregar\_requisicoes()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_a07e2826a68c5f729297af8d6d716e5de} 
+modulo\+\_\+requisicoes.\+carregar\+\_\+requisicoes (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Carrega todas as requisições.
+
+:return: Lista com id, livro_id, utilizador_id, requisitante, ativa, e opcionalmente
+         data_requisicao e data_limite (ISO ``YYYY-MM-DD``) em requisições novas.
+:rtype: list[dict]
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__requisicoes_ac600661763dff5fd829a1374bbe3ccdf}\index{modulo\_requisicoes@{modulo\_requisicoes}!catalogo\_disponibilidade\_formatado@{catalogo\_disponibilidade\_formatado}}
+\index{catalogo\_disponibilidade\_formatado@{catalogo\_disponibilidade\_formatado}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{catalogo\_disponibilidade\_formatado()}{catalogo\_disponibilidade\_formatado()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_ac600661763dff5fd829a1374bbe3ccdf} 
+modulo\+\_\+requisicoes.\+catalogo\+\_\+disponibilidade\+\_\+formatado (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespacemodulo__requisicoes_a8a3043239f039d2a60c1365c1b7a6ca7}\index{modulo\_requisicoes@{modulo\_requisicoes}!contar\_requisicoes\_ativas\_por\_livro@{contar\_requisicoes\_ativas\_por\_livro}}
+\index{contar\_requisicoes\_ativas\_por\_livro@{contar\_requisicoes\_ativas\_por\_livro}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{contar\_requisicoes\_ativas\_por\_livro()}{contar\_requisicoes\_ativas\_por\_livro()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_a8a3043239f039d2a60c1365c1b7a6ca7} 
+modulo\+\_\+requisicoes.\+contar\+\_\+requisicoes\+\_\+ativas\+\_\+por\+\_\+livro (\begin{DoxyParamCaption}\item[{}]{livro\+\_\+id}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Conta quantos exemplares de um livro estão atualmente requisitados.
+
+:param livro_id: Identificador do livro
+:rtype: int
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__requisicoes_ab72d824b66a6bf981d2a59374b7b22c8}\index{modulo\_requisicoes@{modulo\_requisicoes}!devolver@{devolver}}
+\index{devolver@{devolver}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{devolver()}{devolver()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_ab72d824b66a6bf981d2a59374b7b22c8} 
+modulo\+\_\+requisicoes.\+devolver (\begin{DoxyParamCaption}\item[{}]{requisicao\+\_\+id}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Encerra uma requisição (devolução de exemplar).
+
+:param requisicao_id: Identificador da requisição
+:return: Tupla (sucesso, mensagem)
+:rtype: tuple[bool, str]
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__requisicoes_a1d61e4b389cb2687615a42cec12ff28f}\index{modulo\_requisicoes@{modulo\_requisicoes}!exemplares\_disponiveis@{exemplares\_disponiveis}}
+\index{exemplares\_disponiveis@{exemplares\_disponiveis}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{exemplares\_disponiveis()}{exemplares\_disponiveis()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_a1d61e4b389cb2687615a42cec12ff28f} 
+modulo\+\_\+requisicoes.\+exemplares\+\_\+disponiveis (\begin{DoxyParamCaption}\item[{}]{livro\+\_\+id}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Calcula quantos exemplares ainda podem ser requisitados.
+
+:param livro_id: Identificador do livro
+:return: Número de exemplares livres ou 0 se o livro não existir
+:rtype: int
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__requisicoes_a089104653569edccff633f0bd9e48285}\index{modulo\_requisicoes@{modulo\_requisicoes}!formatar\_livros\_com\_disponibilidade@{formatar\_livros\_com\_disponibilidade}}
+\index{formatar\_livros\_com\_disponibilidade@{formatar\_livros\_com\_disponibilidade}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{formatar\_livros\_com\_disponibilidade()}{formatar\_livros\_com\_disponibilidade()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_a089104653569edccff633f0bd9e48285} 
+modulo\+\_\+requisicoes.\+formatar\+\_\+livros\+\_\+com\+\_\+disponibilidade (\begin{DoxyParamCaption}\item[{}]{livros}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespacemodulo__requisicoes_af5870d0c7b0267f08fc65462c4892ed3}\index{modulo\_requisicoes@{modulo\_requisicoes}!listar\_por\_utilizador@{listar\_por\_utilizador}}
+\index{listar\_por\_utilizador@{listar\_por\_utilizador}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{listar\_por\_utilizador()}{listar\_por\_utilizador()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_af5870d0c7b0267f08fc65462c4892ed3} 
+modulo\+\_\+requisicoes.\+listar\+\_\+por\+\_\+utilizador (\begin{DoxyParamCaption}\item[{}]{utilizador\+\_\+id}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Lista requisições ativas de um utilizador (para escolher devolução).
+
+:rtype: str
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__requisicoes_a2df042c4af1c49efa71386cc7097fcbf}\index{modulo\_requisicoes@{modulo\_requisicoes}!listar\_requisitadas\_admin@{listar\_requisitadas\_admin}}
+\index{listar\_requisitadas\_admin@{listar\_requisitadas\_admin}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{listar\_requisitadas\_admin()}{listar\_requisitadas\_admin()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_a2df042c4af1c49efa71386cc7097fcbf} 
+modulo\+\_\+requisicoes.\+listar\+\_\+requisitadas\+\_\+admin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Lista requisições ativas com título do livro e disponibilidade restante.
+
+Destina-se ao administrador para perceber se outros podem requisitar.
+
+:return: Texto formatado para consola
+:rtype: str
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__requisicoes_af084154a90e0d2bb65831cc841551458}\index{modulo\_requisicoes@{modulo\_requisicoes}!listar\_stock\_por\_livro\_formatado@{listar\_stock\_por\_livro\_formatado}}
+\index{listar\_stock\_por\_livro\_formatado@{listar\_stock\_por\_livro\_formatado}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{listar\_stock\_por\_livro\_formatado()}{listar\_stock\_por\_livro\_formatado()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_af084154a90e0d2bb65831cc841551458} 
+modulo\+\_\+requisicoes.\+listar\+\_\+stock\+\_\+por\+\_\+livro\+\_\+formatado (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespacemodulo__requisicoes_a11fb121e88a64928a2e9e21d1a337c2c}\index{modulo\_requisicoes@{modulo\_requisicoes}!prazos\_minhas\_requisicoes\_formatado@{prazos\_minhas\_requisicoes\_formatado}}
+\index{prazos\_minhas\_requisicoes\_formatado@{prazos\_minhas\_requisicoes\_formatado}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{prazos\_minhas\_requisicoes\_formatado()}{prazos\_minhas\_requisicoes\_formatado()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_a11fb121e88a64928a2e9e21d1a337c2c} 
+modulo\+\_\+requisicoes.\+prazos\+\_\+minhas\+\_\+requisicoes\+\_\+formatado (\begin{DoxyParamCaption}\item[{}]{utilizador\+\_\+id}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespacemodulo__requisicoes_a31b1c0b004fc35bbb31db0749821d0ec}\index{modulo\_requisicoes@{modulo\_requisicoes}!requisicao\_pertence\_a\_utilizador@{requisicao\_pertence\_a\_utilizador}}
+\index{requisicao\_pertence\_a\_utilizador@{requisicao\_pertence\_a\_utilizador}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{requisicao\_pertence\_a\_utilizador()}{requisicao\_pertence\_a\_utilizador()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_a31b1c0b004fc35bbb31db0749821d0ec} 
+modulo\+\_\+requisicoes.\+requisicao\+\_\+pertence\+\_\+a\+\_\+utilizador (\begin{DoxyParamCaption}\item[{}]{reg}{, }\item[{}]{utilizador\+\_\+id}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Verifica se a requisição pertence ao utilizador (por id ou legado por nome).
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__requisicoes_a64253ae5dd92a5d07be0245f0d370594}\index{modulo\_requisicoes@{modulo\_requisicoes}!requisitar@{requisitar}}
+\index{requisitar@{requisitar}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{requisitar()}{requisitar()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_a64253ae5dd92a5d07be0245f0d370594} 
+modulo\+\_\+requisicoes.\+requisitar (\begin{DoxyParamCaption}\item[{}]{livro\+\_\+id}{, }\item[{}]{utilizador\+\_\+id}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Cria uma requisição ativa se houver exemplar disponível.
+
+:param livro_id: Identificador do livro
+:param utilizador_id: Identificador do utilizador registado
+:return: Tupla (sucesso: bool, mensagem: str, requisicao ou None)
+:rtype: tuple[bool, str, dict | None]
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__requisicoes_af0c802764a5c2e2ddc84b26aa210512d}\index{modulo\_requisicoes@{modulo\_requisicoes}!resumo\_requisicoes\_utilizador@{resumo\_requisicoes\_utilizador}}
+\index{resumo\_requisicoes\_utilizador@{resumo\_requisicoes\_utilizador}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{resumo\_requisicoes\_utilizador()}{resumo\_requisicoes\_utilizador()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_af0c802764a5c2e2ddc84b26aa210512d} 
+modulo\+\_\+requisicoes.\+resumo\+\_\+requisicoes\+\_\+utilizador (\begin{DoxyParamCaption}\item[{}]{utilizador\+\_\+id}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Texto com totais e histórico recente de requisições do utilizador.
+
+:rtype: str
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__requisicoes_aeb2a4599aad9a6952f335ac3ff87d171}\index{modulo\_requisicoes@{modulo\_requisicoes}!texto\_tempo\_restante\_devolucao@{texto\_tempo\_restante\_devolucao}}
+\index{texto\_tempo\_restante\_devolucao@{texto\_tempo\_restante\_devolucao}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{texto\_tempo\_restante\_devolucao()}{texto\_tempo\_restante\_devolucao()}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_aeb2a4599aad9a6952f335ac3ff87d171} 
+modulo\+\_\+requisicoes.\+texto\+\_\+tempo\+\_\+restante\+\_\+devolucao (\begin{DoxyParamCaption}\item[{}]{data\+\_\+limite\+\_\+iso}{}\end{DoxyParamCaption})}
+
+
+
+\label{doc-var-members}
+\Hypertarget{namespacemodulo__requisicoes_doc-var-members}
+\doxysubsection{Documentação das variáveis}
+\Hypertarget{namespacemodulo__requisicoes_ac8600e6352b6815965ca7519267ab6d4}\index{modulo\_requisicoes@{modulo\_requisicoes}!\_DADOS@{\_DADOS}}
+\index{\_DADOS@{\_DADOS}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{\_DADOS}{\_DADOS}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_ac8600e6352b6815965ca7519267ab6d4} 
+str modulo\+\_\+requisicoes.\+\_\+\+DADOS = Path(\+\_\+\+\_\+file\+\_\+\+\_\+).resolve().parent.\+parent /\+ "{}data"{} /\+ "{}requisicoes.\+json"{}\hspace{0.3cm}{\ttfamily [protected]}}
+
+\Hypertarget{namespacemodulo__requisicoes_ab7608d28663356da6c830cade19c6c64}\index{modulo\_requisicoes@{modulo\_requisicoes}!DIAS\_PRAZO\_EMPRESTIMO@{DIAS\_PRAZO\_EMPRESTIMO}}
+\index{DIAS\_PRAZO\_EMPRESTIMO@{DIAS\_PRAZO\_EMPRESTIMO}!modulo\_requisicoes@{modulo\_requisicoes}}
+\doxysubsubsection{\texorpdfstring{DIAS\_PRAZO\_EMPRESTIMO}{DIAS\_PRAZO\_EMPRESTIMO}}
+{\footnotesize\ttfamily \label{namespacemodulo__requisicoes_ab7608d28663356da6c830cade19c6c64} 
+int modulo\+\_\+requisicoes.\+DIAS\+\_\+\+PRAZO\+\_\+\+EMPRESTIMO = 14}
+

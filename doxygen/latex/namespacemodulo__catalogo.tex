@@ -1,0 +1,139 @@
+\doxysection{Referência ao namespace modulo\+\_\+catalogo}
+\hypertarget{namespacemodulo__catalogo}{}\label{namespacemodulo__catalogo}\index{modulo\_catalogo@{modulo\_catalogo}}
+\doxysubsubsection*{Funções}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{namespacemodulo__catalogo_afea9cdf3f692ddc7dccb20dfbae2a2a3}{\+\_\+garantir\+\_\+ficheiro}} ()
+\item 
+\doxymbox{\hyperlink{namespacemodulo__catalogo_a2bd044e54a41edab302403958cecd15d}{carregar\+\_\+livros}} ()
+\item 
+\doxymbox{\hyperlink{namespacemodulo__catalogo_ae7ba2e81bff53d018b85ac1836f1102d}{\+\_\+guardar\+\_\+livros}} (livros)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__catalogo_ac18f2577387a789e2c578a40e60abe8c}{\+\_\+proximo\+\_\+id}} (livros)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__catalogo_a2c96543edd31a36b596f60edc167147d}{adicionar\+\_\+livro}} (titulo, autor, exemplares, tema="{}"{})
+\item 
+\doxymbox{\hyperlink{namespacemodulo__catalogo_a57b6f9a32bd47b5fc5ab5ad5e1e569d0}{pesquisar\+\_\+por\+\_\+autor}} (termo)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__catalogo_a601f8d7a4a7bdd841794a41e765137d8}{pesquisar\+\_\+por\+\_\+tema}} (termo)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__catalogo_aefc7eccb7c81b00ec12005af2dd354b0}{obter\+\_\+livro}} (livro\+\_\+id)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__catalogo_a7af2cb72111d9a502ec3ea75a13a5038}{atualizar\+\_\+exemplares}} (livro\+\_\+id, novo\+\_\+total)
+\item 
+\doxymbox{\hyperlink{namespacemodulo__catalogo_a0c5d2ebced0615ce9786b036510a9934}{listar\+\_\+catalogo\+\_\+formatado}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variáveis}
+\begin{DoxyCompactItemize}
+\item 
+str \doxymbox{\hyperlink{namespacemodulo__catalogo_a05cd1f8df32aa5a329bed0cd7c3e2e65}{\+\_\+\+DADOS}} = Path(\+\_\+\+\_\+file\+\_\+\+\_\+).resolve().parent.\+parent /\+ "{}data"{} /\+ "{}livros.\+json"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Descrição detalhada}
+\begin{DoxyVerb}Gestão do catálogo de livros (persistência em JSON).
+
+Este módulo expõe operações para o administrador manter o catálogo atualizado
+e para qualquer perfil listar os livros disponíveis para consulta.
+\end{DoxyVerb}
+ 
+
+\label{doc-func-members}
+\Hypertarget{namespacemodulo__catalogo_doc-func-members}
+\doxysubsection{Documentação das funções}
+\Hypertarget{namespacemodulo__catalogo_afea9cdf3f692ddc7dccb20dfbae2a2a3}\index{modulo\_catalogo@{modulo\_catalogo}!\_garantir\_ficheiro@{\_garantir\_ficheiro}}
+\index{\_garantir\_ficheiro@{\_garantir\_ficheiro}!modulo\_catalogo@{modulo\_catalogo}}
+\doxysubsubsection{\texorpdfstring{\_garantir\_ficheiro()}{\_garantir\_ficheiro()}}
+{\footnotesize\ttfamily \label{namespacemodulo__catalogo_afea9cdf3f692ddc7dccb20dfbae2a2a3} 
+modulo\+\_\+catalogo.\+\_\+garantir\+\_\+ficheiro (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\Hypertarget{namespacemodulo__catalogo_ae7ba2e81bff53d018b85ac1836f1102d}\index{modulo\_catalogo@{modulo\_catalogo}!\_guardar\_livros@{\_guardar\_livros}}
+\index{\_guardar\_livros@{\_guardar\_livros}!modulo\_catalogo@{modulo\_catalogo}}
+\doxysubsubsection{\texorpdfstring{\_guardar\_livros()}{\_guardar\_livros()}}
+{\footnotesize\ttfamily \label{namespacemodulo__catalogo_ae7ba2e81bff53d018b85ac1836f1102d} 
+modulo\+\_\+catalogo.\+\_\+guardar\+\_\+livros (\begin{DoxyParamCaption}\item[{}]{livros}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\Hypertarget{namespacemodulo__catalogo_ac18f2577387a789e2c578a40e60abe8c}\index{modulo\_catalogo@{modulo\_catalogo}!\_proximo\_id@{\_proximo\_id}}
+\index{\_proximo\_id@{\_proximo\_id}!modulo\_catalogo@{modulo\_catalogo}}
+\doxysubsubsection{\texorpdfstring{\_proximo\_id()}{\_proximo\_id()}}
+{\footnotesize\ttfamily \label{namespacemodulo__catalogo_ac18f2577387a789e2c578a40e60abe8c} 
+modulo\+\_\+catalogo.\+\_\+proximo\+\_\+id (\begin{DoxyParamCaption}\item[{}]{livros}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\Hypertarget{namespacemodulo__catalogo_a2c96543edd31a36b596f60edc167147d}\index{modulo\_catalogo@{modulo\_catalogo}!adicionar\_livro@{adicionar\_livro}}
+\index{adicionar\_livro@{adicionar\_livro}!modulo\_catalogo@{modulo\_catalogo}}
+\doxysubsubsection{\texorpdfstring{adicionar\_livro()}{adicionar\_livro()}}
+{\footnotesize\ttfamily \label{namespacemodulo__catalogo_a2c96543edd31a36b596f60edc167147d} 
+modulo\+\_\+catalogo.\+adicionar\+\_\+livro (\begin{DoxyParamCaption}\item[{}]{titulo}{, }\item[{}]{autor}{, }\item[{}]{exemplares}{, }\item[{}]{tema}{ = {\ttfamily "{}"{}}}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Regista um novo livro no catálogo.
+
+:param titulo: Título do livro
+:param autor: Nome do autor
+:param exemplares: Número de exemplares físicos (>= 1)
+:param tema: Tema ou género (opcional), usado na pesquisa
+:return: O dicionário do livro criado
+:rtype: dict
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__catalogo_a7af2cb72111d9a502ec3ea75a13a5038}\index{modulo\_catalogo@{modulo\_catalogo}!atualizar\_exemplares@{atualizar\_exemplares}}
+\index{atualizar\_exemplares@{atualizar\_exemplares}!modulo\_catalogo@{modulo\_catalogo}}
+\doxysubsubsection{\texorpdfstring{atualizar\_exemplares()}{atualizar\_exemplares()}}
+{\footnotesize\ttfamily \label{namespacemodulo__catalogo_a7af2cb72111d9a502ec3ea75a13a5038} 
+modulo\+\_\+catalogo.\+atualizar\+\_\+exemplares (\begin{DoxyParamCaption}\item[{}]{livro\+\_\+id}{, }\item[{}]{novo\+\_\+total}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespacemodulo__catalogo_a2bd044e54a41edab302403958cecd15d}\index{modulo\_catalogo@{modulo\_catalogo}!carregar\_livros@{carregar\_livros}}
+\index{carregar\_livros@{carregar\_livros}!modulo\_catalogo@{modulo\_catalogo}}
+\doxysubsubsection{\texorpdfstring{carregar\_livros()}{carregar\_livros()}}
+{\footnotesize\ttfamily \label{namespacemodulo__catalogo_a2bd044e54a41edab302403958cecd15d} 
+modulo\+\_\+catalogo.\+carregar\+\_\+livros (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Carrega todos os livros do ficheiro de dados.
+
+:return: Lista de dicionários com id, titulo, autor, exemplares e opcionalmente tema
+:rtype: list[dict]
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__catalogo_a0c5d2ebced0615ce9786b036510a9934}\index{modulo\_catalogo@{modulo\_catalogo}!listar\_catalogo\_formatado@{listar\_catalogo\_formatado}}
+\index{listar\_catalogo\_formatado@{listar\_catalogo\_formatado}!modulo\_catalogo@{modulo\_catalogo}}
+\doxysubsubsection{\texorpdfstring{listar\_catalogo\_formatado()}{listar\_catalogo\_formatado()}}
+{\footnotesize\ttfamily \label{namespacemodulo__catalogo_a0c5d2ebced0615ce9786b036510a9934} 
+modulo\+\_\+catalogo.\+listar\+\_\+catalogo\+\_\+formatado (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Devolve linhas de texto com o catálogo completo para apresentação na consola.
+
+:return: Texto com um livro por linha (id, título, autor, exemplares)
+:rtype: str
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__catalogo_aefc7eccb7c81b00ec12005af2dd354b0}\index{modulo\_catalogo@{modulo\_catalogo}!obter\_livro@{obter\_livro}}
+\index{obter\_livro@{obter\_livro}!modulo\_catalogo@{modulo\_catalogo}}
+\doxysubsubsection{\texorpdfstring{obter\_livro()}{obter\_livro()}}
+{\footnotesize\ttfamily \label{namespacemodulo__catalogo_aefc7eccb7c81b00ec12005af2dd354b0} 
+modulo\+\_\+catalogo.\+obter\+\_\+livro (\begin{DoxyParamCaption}\item[{}]{livro\+\_\+id}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Obtém um livro pelo identificador.
+
+:param livro_id: Identificador do livro
+:return: Dicionário do livro ou None se não existir
+:rtype: dict | None
+\end{DoxyVerb}
+ \Hypertarget{namespacemodulo__catalogo_a57b6f9a32bd47b5fc5ab5ad5e1e569d0}\index{modulo\_catalogo@{modulo\_catalogo}!pesquisar\_por\_autor@{pesquisar\_por\_autor}}
+\index{pesquisar\_por\_autor@{pesquisar\_por\_autor}!modulo\_catalogo@{modulo\_catalogo}}
+\doxysubsubsection{\texorpdfstring{pesquisar\_por\_autor()}{pesquisar\_por\_autor()}}
+{\footnotesize\ttfamily \label{namespacemodulo__catalogo_a57b6f9a32bd47b5fc5ab5ad5e1e569d0} 
+modulo\+\_\+catalogo.\+pesquisar\+\_\+por\+\_\+autor (\begin{DoxyParamCaption}\item[{}]{termo}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespacemodulo__catalogo_a601f8d7a4a7bdd841794a41e765137d8}\index{modulo\_catalogo@{modulo\_catalogo}!pesquisar\_por\_tema@{pesquisar\_por\_tema}}
+\index{pesquisar\_por\_tema@{pesquisar\_por\_tema}!modulo\_catalogo@{modulo\_catalogo}}
+\doxysubsubsection{\texorpdfstring{pesquisar\_por\_tema()}{pesquisar\_por\_tema()}}
+{\footnotesize\ttfamily \label{namespacemodulo__catalogo_a601f8d7a4a7bdd841794a41e765137d8} 
+modulo\+\_\+catalogo.\+pesquisar\+\_\+por\+\_\+tema (\begin{DoxyParamCaption}\item[{}]{termo}{}\end{DoxyParamCaption})}
+
+
+
+\label{doc-var-members}
+\Hypertarget{namespacemodulo__catalogo_doc-var-members}
+\doxysubsection{Documentação das variáveis}
+\Hypertarget{namespacemodulo__catalogo_a05cd1f8df32aa5a329bed0cd7c3e2e65}\index{modulo\_catalogo@{modulo\_catalogo}!\_DADOS@{\_DADOS}}
+\index{\_DADOS@{\_DADOS}!modulo\_catalogo@{modulo\_catalogo}}
+\doxysubsubsection{\texorpdfstring{\_DADOS}{\_DADOS}}
+{\footnotesize\ttfamily \label{namespacemodulo__catalogo_a05cd1f8df32aa5a329bed0cd7c3e2e65} 
+str modulo\+\_\+catalogo.\+\_\+\+DADOS = Path(\+\_\+\+\_\+file\+\_\+\+\_\+).resolve().parent.\+parent /\+ "{}data"{} /\+ "{}livros.\+json"{}\hspace{0.3cm}{\ttfamily [protected]}}
+
