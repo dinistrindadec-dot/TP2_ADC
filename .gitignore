@@ -9,3 +9,6 @@ data/livros.json
 data/requisicoes.json
 data/utilizadores.json
 data/backups/
+
+docs_sphinx/_build/*
+!docs_sphinx/_build/.gitkeep

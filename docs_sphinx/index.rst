@@ -13,3 +13,11 @@ Conteúdo gerado com Sphinx a partir dos módulos em ``src/``.
    modulo_catalogo
    modulo_requisicoes
    modulo_utilizadores
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
