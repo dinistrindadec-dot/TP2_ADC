@@ -453,6 +453,14 @@ def fluxo_admin_backup():
 
 
 def painel_admin():
+    """Loop principal do painel do administrador.
+
+    Executa o menu e despacha para o fluxo correspondente, até o utilizador
+    escolher "Voltar".
+
+    Returns:
+        None
+    """
     while True:
         op = menu_admin()
         if op == 1:
@@ -474,6 +482,14 @@ def painel_admin():
 
 
 def painel_leitor():
+    """Loop principal do painel do leitor.
+
+    Executa o menu e despacha para o fluxo correspondente, até o utilizador
+    escolher "Voltar".
+
+    Returns:
+        None
+    """
     while True:
         op = menu_leitor()
         if op == 1:
