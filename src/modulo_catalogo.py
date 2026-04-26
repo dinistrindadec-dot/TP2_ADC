@@ -88,7 +88,14 @@ def adicionar_livro(titulo, autor, exemplares, tema=""):
 
 
 def pesquisar_por_autor(termo):
+    """Pesquisa livros por autor (correspondência parcial, case-insensitive).
 
+    Args:
+        termo (str): Texto (parcial) a procurar no campo `autor`.
+
+    Returns:
+        list[dict]: Lista de livros cujo autor contém o `termo`.
+    """
     termo = termo.strip().lower()
     if not termo:
         return []
@@ -100,7 +107,14 @@ def pesquisar_por_autor(termo):
 
 
 def pesquisar_por_tema(termo):
+    """Pesquisa livros por tema/género (correspondência parcial).
 
+    Args:
+        termo (str): Texto (parcial) a procurar no campo `tema`.
+
+    Returns:
+        list[dict]: Lista de livros cujo tema contém o `termo`.
+    """
     termo = termo.strip().lower()
     if not termo:
         return []
@@ -115,9 +129,11 @@ def obter_livro(livro_id):
     """
     Obtém um livro pelo identificador.
 
-    :param livro_id: Identificador do livro
-    :return: Dicionário do livro ou None se não existir
-    :rtype: dict | None
+    Args:
+        livro_id (int): Identificador do livro.
+
+    Returns:
+        dict | None: Dicionário do livro, ou `None` se não existir.
     """
     for livro in carregar_livros():
         if livro["id"] == livro_id:
