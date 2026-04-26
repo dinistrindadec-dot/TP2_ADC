@@ -18,39 +18,73 @@ DIAS_PRAZO_EMPRESTIMO = 14
 
 
 def _garantir_ficheiro():
+    """Garante que a pasta e o ficheiro JSON de requisições existem.
+
+    Se o ficheiro ainda não existir, cria-o com uma lista vazia (`[]`).
+    """
     _DADOS.parent.mkdir(parents=True, exist_ok=True)
     if not _DADOS.exists():
         _DADOS.write_text("[]", encoding="utf-8")
 
 
 def carregar_requisicoes():
-    """
-    Carrega todas as requisições.
+    """Carrega todas as requisições a partir do ficheiro JSON.
 
-    :return: Lista com id, livro_id, utilizador_id, requisitante, ativa, e opcionalmente
-             data_requisicao e data_limite (ISO ``YYYY-MM-DD``) em requisições novas.
-    :rtype: list[dict]
+    Estrutura típica de uma requisição (registos recentes)::
+        {
+          "id": int,
+          "livro_id": int,
+          "utilizador_id": int,
+          "requisitante": str,
+          "ativa": bool,
+          "data_requisicao": "YYYY-MM-DD",
+          "data_limite": "YYYY-MM-DD"
+        }
+
+    Nota: podem existir registos antigos sem `utilizador_id` e/ou sem datas.
+
+    Returns:
+        list[dict]: Lista de requisições (ativas e concluídas).
     """
     _garantir_ficheiro()
     return json.loads(_DADOS.read_text(encoding="utf-8"))
 
 
 def _guardar_requisicoes(regs):
-    _DADOS.write_text(json.dumps(regs, ensure_ascii=False, indent=2), encoding="utf-8")
+    """Persiste a lista completa de requisições no ficheiro JSON.
+
+    Args:
+        regs (list[dict]): Lista de requisições a gravar.
+    """
+    _DADOS.write_text(
+        json.dumps(regs, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
 
 
 def _proximo_id(regs):
+    """Calcula o próximo identificador sequencial para uma requisição.
+
+    Args:
+        regs (list[dict]): Lista de requisições.
+
+    Returns:
+        int: Próximo identificador.
+    """
     if not regs:
         return 1
     return max(r["id"] for r in regs) + 1
 
 
 def contar_requisicoes_ativas_por_livro(livro_id):
-    """
-    Conta quantos exemplares de um livro estão atualmente requisitados.
+    """Conta quantas requisições ativas existem para um determinado livro.
 
-    :param livro_id: Identificador do livro
-    :rtype: int
+    Cada registo ativo corresponde a um exemplar emprestado.
+
+    Args:
+        livro_id (int): Identificador do livro.
+
+    Returns:
+        int: Número de exemplares atualmente em requisição.
     """
     return sum(
         1
@@ -60,7 +94,18 @@ def contar_requisicoes_ativas_por_livro(livro_id):
 
 
 def texto_tempo_restante_devolucao(data_limite_iso):
+    """Converte uma data limite (ISO) num texto amigável sobre o prazo.
 
+    Este helper existe para manter a lógica de apresentação consistente em
+    vários ecrãs/fluxos (listagens por utilizador e painel do administrador).
+
+    Args:
+        data_limite_iso (str | None): Data em formato ISO (`YYYY-MM-DD`) ou
+            `None`.
+
+    Returns:
+        str: Mensagem humana (dias restantes, último dia, ou atraso).
+    """
     if not data_limite_iso:
         return "Prazo não definido nesta requisição (registo antigo)."
     try:
@@ -80,10 +125,14 @@ def texto_tempo_restante_devolucao(data_limite_iso):
 
 
 def _linha_livro_com_disponibilidade(livro):
-    """
-    Uma entrada de catálogo com estado de disponibilidade (e tema, se existir).
+    """Gera uma linha (multi-linha) para mostrar um livro e a sua disponibilidade.
 
-    :rtype: str
+    Args:
+        livro (dict): Livro (como devolvido por
+            `modulo_catalogo.carregar_livros`).
+
+    Returns:
+        str: Texto formatado com título/autor/tema e um resumo do estado.
     """
     lid = livro["id"]
     disp = exemplares_disponiveis(lid)
@@ -97,12 +146,17 @@ def _linha_livro_com_disponibilidade(livro):
     tema = livro.get("tema", "").strip()
     extra_tema = f" | Tema: {tema}" if tema else ""
     return (
-        f"  [{lid}] «{livro['titulo']}» — {livro['autor']}{extra_tema}\n      {estado}"
+        f"  [{lid}] «{livro['titulo']}» — {livro['autor']}{extra_tema}\n"
+        f"      {estado}"
     )
 
 
 def catalogo_disponibilidade_formatado():
+    """Devolve o catálogo completo com disponibilidade calculada.
 
+    Returns:
+        str: Texto pronto a imprimir na consola.
+    """
     livros = modulo_catalogo.carregar_livros()
     if not livros:
         return "(Catálogo vazio — ainda não existem livros registados.)"
@@ -110,19 +164,30 @@ def catalogo_disponibilidade_formatado():
 
 
 def formatar_livros_com_disponibilidade(livros):
+    """Formata uma lista de livros (subconjunto do catálogo) com disponibilidade.
 
+    Args:
+        livros (list[dict]): Livros a formatar (como devolvidos por pesquisas).
+
+    Returns:
+        str: Texto pronto a imprimir.
+    """
     if not livros:
         return "(Nenhum livro corresponde à pesquisa.)"
     return "\n".join(_linha_livro_com_disponibilidade(livro) for livro in livros)
 
 
 def exemplares_disponiveis(livro_id):
-    """
-    Calcula quantos exemplares ainda podem ser requisitados.
+    """Calcula quantos exemplares de um livro ainda podem ser requisitados.
 
-    :param livro_id: Identificador do livro
-    :return: Número de exemplares livres ou 0 se o livro não existir
-    :rtype: int
+    A disponibilidade é calculada como:
+    `exemplares_total - requisições_ativas` (limitado a 0).
+
+    Args:
+        livro_id (int): Identificador do livro.
+
+    Returns:
+        int: Número de exemplares disponíveis (0 se o livro não existir).
     """
     livro = modulo_catalogo.obter_livro(livro_id)
     if livro is None:
@@ -132,19 +197,35 @@ def exemplares_disponiveis(livro_id):
 
 
 def requisitar(livro_id, utilizador_id):
-    """
-    Cria uma requisição ativa se houver exemplar disponível.
+    """Cria uma nova requisição ativa, se houver exemplar disponível.
 
-    :param livro_id: Identificador do livro
-    :param utilizador_id: Identificador do utilizador registado
-    :return: Tupla (sucesso: bool, mensagem: str, requisicao ou None)
-    :rtype: tuple[bool, str, dict | None]
+    Este método valida:
+    - existência do utilizador
+    - existência do livro
+    - disponibilidade (pelo menos 1 exemplar livre)
+
+    Em caso de sucesso, grava a requisição com datas (hoje e data limite).
+
+    Args:
+        livro_id (int): Identificador do livro.
+        utilizador_id (int): Identificador do utilizador.
+
+    Returns:
+        tuple[bool, str, dict | None]:
+            - sucesso (bool)
+            - mensagem (str) para apresentação
+            - registo da requisição (dict) ou `None` em caso de erro
     """
+    # Import local para evitar dependência circular em tempo de import.
     import modulo_utilizadores
 
     utilizador = modulo_utilizadores.obter_utilizador(utilizador_id)
     if utilizador is None:
-        return False, "Utilizador não encontrado. Peça ao administrador o registo.", None
+        return (
+            False,
+            "Utilizador não encontrado. Peça ao administrador o registo.",
+            None,
+        )
 
     livro = modulo_catalogo.obter_livro(livro_id)
     if livro is None:
@@ -174,12 +255,13 @@ def requisitar(livro_id, utilizador_id):
 
 
 def devolver(requisicao_id):
-    """
-    Encerra uma requisição (devolução de exemplar).
+    """Encerra uma requisição ativa (regista a devolução do exemplar).
 
-    :param requisicao_id: Identificador da requisição
-    :return: Tupla (sucesso, mensagem)
-    :rtype: tuple[bool, str]
+    Args:
+        requisicao_id (int): Identificador da requisição.
+
+    Returns:
+        tuple[bool, str]: Resultado da operação e mensagem.
     """
     regs = carregar_requisicoes()
     for r in regs:
@@ -193,13 +275,17 @@ def devolver(requisicao_id):
 
 
 def listar_requisitadas_admin():
-    """
-    Lista requisições ativas com título do livro e disponibilidade restante.
+    """Lista requisições ativas para o administrador.
 
-    Destina-se ao administrador para perceber se outros podem requisitar.
+    Inclui:
+    - identificador da requisição
+    - título do livro
+    - nome do requisitante
+    - exemplares ainda disponíveis para terceiros
+    - data limite (se existir e for válida)
 
-    :return: Texto formatado para consola
-    :rtype: str
+    Returns:
+        str: Texto formatado para consola.
     """
     ativas = [r for r in carregar_requisicoes() if r["ativa"]]
     if not ativas:
@@ -227,9 +313,20 @@ def listar_requisitadas_admin():
 
 
 def requisicao_pertence_a_utilizador(reg, utilizador_id):
+    """Valida se uma requisição pertence a um utilizador.
+
+    A regra preferencial é por `utilizador_id`. Para compatibilidade com
+    registos antigos (legados), se `utilizador_id` não existir no registo,
+    valida por nome (`requisitante`).
+
+    Args:
+        reg (dict): Registo de requisição.
+        utilizador_id (int): Identificador do utilizador.
+
+    Returns:
+        bool: `True` se a requisição pertencer ao utilizador.
     """
-    Verifica se a requisição pertence ao utilizador (por id ou legado por nome).
-    """
+    # Alguns registos antigos podem não ter `utilizador_id`, apenas nome.
     uid = reg.get("utilizador_id")
     if uid is not None:
         return uid == utilizador_id
@@ -242,7 +339,14 @@ def requisicao_pertence_a_utilizador(reg, utilizador_id):
 
 
 def prazos_minhas_requisicoes_formatado(utilizador_id):
+    """Lista requisições ativas do utilizador e descreve o prazo de devolução.
 
+    Args:
+        utilizador_id (int): Identificador do utilizador.
+
+    Returns:
+        str: Texto formatado para consola.
+    """
     ativas = [
         r
         for r in carregar_requisicoes()
@@ -255,15 +359,20 @@ def prazos_minhas_requisicoes_formatado(utilizador_id):
         livro = modulo_catalogo.obter_livro(r["livro_id"])
         titulo = livro["titulo"] if livro else "?"
         linhas.append(f"  [#{r['id']}] «{titulo}»")
-        linhas.append(f"      {texto_tempo_restante_devolucao(r.get('data_limite'))}")
+        linhas.append(
+            f"      {texto_tempo_restante_devolucao(r.get('data_limite'))}"
+        )
     return "\n".join(linhas)
 
 
 def listar_por_utilizador(utilizador_id):
-    """
-    Lista requisições ativas de um utilizador (para escolher devolução).
+    """Lista requisições ativas de um utilizador (para escolher devolução).
 
-    :rtype: str
+    Args:
+        utilizador_id (int): Identificador do utilizador.
+
+    Returns:
+        str: Texto formatado para consola.
     """
     ativas = [
         r
@@ -282,11 +391,18 @@ def listar_por_utilizador(utilizador_id):
 
 
 def resumo_requisicoes_utilizador(utilizador_id):
-    """
-    Texto com totais e histórico recente de requisições do utilizador.
+    """Gera um resumo textual das requisições de um utilizador.
 
-    :rtype: str
+    Inclui contagens de requisições ativas e concluídas e, se existirem
+    requisições ativas, lista-as com o respetivo prazo.
+
+    Args:
+        utilizador_id (int): Identificador do utilizador.
+
+    Returns:
+        str: Texto formatado para a consola.
     """
+    # O resumo é consumido pelo módulo de utilizadores (ficha de utilizador).
     regs = carregar_requisicoes()
     todas = [r for r in regs if requisicao_pertence_a_utilizador(r, utilizador_id)]
     ativas = [r for r in todas if r["ativa"]]
@@ -309,7 +425,16 @@ def resumo_requisicoes_utilizador(utilizador_id):
 
 
 def listar_stock_por_livro_formatado():
+    """Formata um relatório de stock por livro.
 
+    Para cada livro apresenta:
+    - stock total no catálogo
+    - quantos exemplares estão em requisição (requisições ativas)
+    - quantos exemplares estão disponíveis
+
+    Returns:
+        str: Texto pronto a imprimir na consola.
+    """
     livros = modulo_catalogo.carregar_livros()
     if not livros:
         return "(Sem livros no catálogo.)"

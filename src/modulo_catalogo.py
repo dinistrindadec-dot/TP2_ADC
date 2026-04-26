@@ -142,7 +142,19 @@ def obter_livro(livro_id):
 
 
 def atualizar_exemplares(livro_id, novo_total):
+    """Atualiza o número total de exemplares de um livro.
 
+    Nota: esta função **não** valida requisições ativas. Essa validação é feita
+    no fluxo do `main.py` antes de chamar este método (para garantir que o
+    stock não fica abaixo do número de exemplares atualmente emprestados).
+
+    Args:
+        livro_id (int): Identificador do livro.
+        novo_total (int): Novo stock total (>= 1).
+
+    Returns:
+        tuple[bool, str]: Resultado da operação e mensagem para o utilizador.
+    """
     novo_total = int(novo_total)
     if novo_total < 1:
         return False, "O stock total tem de ser pelo menos 1."
@@ -157,10 +169,11 @@ def atualizar_exemplares(livro_id, novo_total):
 
 def listar_catalogo_formatado():
     """
-    Devolve linhas de texto com o catálogo completo para apresentação na consola.
+     Devolve linhas de texto com o catálogo completo para apresentação na
+    consola.
 
-    :return: Texto com um livro por linha (id, título, autor, exemplares)
-    :rtype: str
+    Returns:
+        str: Texto com um livro por linha (id, título, autor, exemplares).
     """
     livros = carregar_livros()
     if not livros:
