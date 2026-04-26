@@ -133,6 +133,14 @@ def _pedir_inteiro_minimo(mensagem, minimo):
 
 
 def fluxo_admin_criar_livro():
+    """Fluxo do administrador: registo de um novo livro no catálogo.
+
+    Solicita título/autor (obrigatórios), número de exemplares (>= 1) e um tema
+    opcional para permitir pesquisa.
+
+    Returns:
+        None
+    """
     titulo = input("Título: ").strip()
     autor = input("Autor: ").strip()
     if not titulo or not autor:
@@ -145,16 +153,33 @@ def fluxo_admin_criar_livro():
 
 
 def fluxo_admin_ver_requisitados():
+    """Fluxo do administrador: listagem de requisições ativas.
+
+    Returns:
+        None
+    """
     print("\nRequisições atuais (exemplares em requisição):")
     print(modulo_requisicoes.listar_requisitadas_admin())
 
 
 def fluxo_admin_catalogo():
+    """Fluxo do administrador: listagem do catálogo completo.
+
+    Returns:
+        None
+    """
     print("\nCatálogo:")
     print(modulo_catalogo.listar_catalogo_formatado())
 
 
 def fluxo_admin_registar_utilizador():
+    """Fluxo do administrador: registo de um novo utilizador.
+
+    O nome é obrigatório. E-mail e telefone são opcionais.
+
+    Returns:
+        None
+    """
     nome = input("Nome completo: ").strip()
     if not nome:
         print("O nome é obrigatório.")
@@ -169,6 +194,14 @@ def fluxo_admin_registar_utilizador():
 
 
 def fluxo_admin_fichas():
+    """Fluxo do administrador: consulta da ficha de um utilizador.
+
+    Mostra o índice de utilizadores e pede o `id` para apresentar a ficha
+    detalhada (incluindo resumo de requisições).
+
+    Returns:
+        None
+    """
     print("\nUtilizadores:")
     print(modulo_utilizadores.listar_indice_formatado())
     try:
@@ -181,6 +214,15 @@ def fluxo_admin_fichas():
 
 
 def fluxo_admin_stock():
+    """Fluxo do administrador: gestão de stock (nº exemplares por livro).
+
+    Este fluxo consulta o stock atual e permite alterar o número total de
+    exemplares de um livro. Antes de alterar, valida que o novo stock não fica
+    abaixo do número de exemplares atualmente requisitados.
+
+    Returns:
+        None
+    """
     while True:
         print("\nStock por livro (total | em requisição | disponível):")
         print(modulo_requisicoes.listar_stock_por_livro_formatado())
@@ -200,6 +242,9 @@ def fluxo_admin_stock():
         if modulo_catalogo.obter_livro(lid) is None:
             print("Livro não encontrado.")
             continue
+        
+        # `em_uso` define o mínimo permitido: não podemos ter menos stock do que
+        # exemplares já emprestados.
         em_uso = modulo_requisicoes.contar_requisicoes_ativas_por_livro(lid)
         minimo = max(1, em_uso)
         print(
@@ -212,11 +257,24 @@ def fluxo_admin_stock():
 
 
 def fluxo_leitor_catalogo():
+    """Fluxo do leitor: consulta do catálogo com disponibilidade.
+
+    Returns:
+        None
+    """
     print("\nCatálogo com disponibilidade para requisição:")
     print(modulo_requisicoes.catalogo_disponibilidade_formatado())
 
 
 def fluxo_leitor_requisitar():
+    """Fluxo do leitor: criação de uma requisição de livro.
+
+    O leitor escolhe o seu `id` de utilizador e depois seleciona o livro a
+    requisitar. A criação e validações são delegadas a `modulo_requisicoes`.
+
+    Returns:
+        None
+    """
     print("\nUtilizadores registados:")
     print(modulo_utilizadores.listar_indice_formatado())
     try:
@@ -239,6 +297,14 @@ def fluxo_leitor_requisitar():
 
 
 def fluxo_leitor_devolver():
+    """Fluxo do leitor: devolução de um livro (encerra uma requisição).
+
+    Mostra as requisições ativas do utilizador e pede o `#id` da requisição
+    para efetuar a devolução.
+
+    Returns:
+        None
+    """
     print("\nUtilizadores registados:")
     print(modulo_utilizadores.listar_indice_formatado())
     try:
@@ -266,6 +332,11 @@ def fluxo_leitor_devolver():
 
 
 def fluxo_leitor_prazos():
+    """Fluxo do leitor: consulta dos prazos das requisições ativas.
+
+    Returns:
+        None
+    """
     print("\nUtilizadores registados:")
     print(modulo_utilizadores.listar_indice_formatado())
     try:
@@ -281,6 +352,14 @@ def fluxo_leitor_prazos():
 
 
 def fluxo_leitor_pesquisar():
+    """Fluxo do leitor: pesquisa de livros por autor ou tema.
+
+    A pesquisa é feita no catálogo e, em seguida, os resultados são formatados
+    com disponibilidade (usando as requisições ativas).
+
+    Returns:
+        None
+    """
     print("\nPesquisa (texto parcial, ignora maiúsculas):")
     print("1. Por autor")
     print("2. Por tema")
@@ -327,6 +406,11 @@ def _pedir_novo_contacto(rotulo, valor_atual):
 
 
 def fluxo_leitor_contactos():
+    """Fluxo do leitor: atualização de contactos (e-mail e telemóvel).
+
+    Returns:
+        None
+    """
     print("\nUtilizadores registados:")
     print(modulo_utilizadores.listar_indice_formatado())
     try:
@@ -348,6 +432,11 @@ def fluxo_leitor_contactos():
 
 
 def fluxo_admin_backup():
+    """Fluxo do administrador: criação de backup dos ficheiros de dados.
+
+    Returns:
+        None
+    """
     try:
         pasta, ficheiros = modulo_backup.criar_backup()
     except OSError as e:
