@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+
+<html lang="pt" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>modulo_backup &#8212; Documentação Biblioteca TP2 </title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/nature.css?v=279e0f84" />
+    <script src="../_static/documentation_options.js?v=103ffe9a"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/translations.js?v=beaedd51"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Pesquisar" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice Geral"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Código do módulo</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">modulo_backup</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Código fonte de modulo_backup</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Cópias de segurança (backup) dos ficheiros de dados.</span>
+
+<span class="sd">Este módulo cria uma cópia de segurança dos ficheiros JSON usados pela</span>
+<span class="sd">aplicação (catálogo, requisições e utilizadores).</span>
+
+<span class="sd">A estratégia é simples:</span>
+<span class="sd">- Cria (se necessário) a pasta `data/`.</span>
+<span class="sd">- Cria (se necessário) a pasta `data/backups/`.</span>
+<span class="sd">- Para cada ficheiro esperado, se existir, copia-o para uma nova subpasta</span>
+<span class="sd">  `backup_&lt;timestamp&gt;/`.</span>
+<span class="sd">- Se nenhum ficheiro existir, remove a pasta de backup criada e devolve</span>
+<span class="sd">  `(None, [])`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># Pasta de dados do projeto (onde vivem os ficheiros JSON).</span>
+<span class="n">_DADOS</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+
+<span class="c1"># Lista de ficheiros que compõem o estado da aplicação.</span>
+<span class="n">_FICHEIROS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;livros.json&quot;</span><span class="p">,</span> <span class="s2">&quot;requisicoes.json&quot;</span><span class="p">,</span> <span class="s2">&quot;utilizadores.json&quot;</span><span class="p">)</span>
+
+<span class="c1"># Pasta onde são guardadas as cópias de segurança.</span>
+<span class="n">_BACKUPS</span> <span class="o">=</span> <span class="n">_DADOS</span> <span class="o">/</span> <span class="s2">&quot;backups&quot;</span>
+
+
+<div class="viewcode-block" id="criar_backup">
+<a class="viewcode-back" href="../modulo_backup.html#modulo_backup.criar_backup">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">criar_backup</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cria um backup dos ficheiros de dados existentes.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple[Path | None, list[str]]:</span>
+<span class="sd">            - Caminho para a pasta de backup criada (ou `None` se não foi</span>
+<span class="sd">              copiado nenhum ficheiro).</span>
+<span class="sd">            - Lista de nomes de ficheiros copiados.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        OSError: Se houver falhas de IO ao criar pastas ou copiar ficheiros.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Garante que a estrutura de pastas existe.</span>
+    <span class="n">_DADOS</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">_BACKUPS</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="c1"># Timestamp com microssegundos para evitar colisões entre backups.</span>
+    <span class="n">stamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">_%H%M%S_</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">pasta</span> <span class="o">=</span> <span class="n">_BACKUPS</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;backup_</span><span class="si">{</span><span class="n">stamp</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">pasta</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">copiados</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">nome</span> <span class="ow">in</span> <span class="n">_FICHEIROS</span><span class="p">:</span>
+        <span class="n">origem</span> <span class="o">=</span> <span class="n">_DADOS</span> <span class="o">/</span> <span class="n">nome</span>
+        <span class="k">if</span> <span class="n">origem</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">origem</span><span class="p">,</span> <span class="n">pasta</span> <span class="o">/</span> <span class="n">nome</span><span class="p">)</span>
+            <span class="n">copiados</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nome</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">copiados</span><span class="p">:</span>
+         <span class="c1"># Se nada foi copiado, o backup não é útil: remove a pasta criada.</span>
+        <span class="n">pasta</span><span class="o">.</span><span class="n">rmdir</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">copiados</span>
+    <span class="k">return</span> <span class="n">pasta</span><span class="p">,</span> <span class="n">copiados</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Pesquisa rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice Geral"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Código do módulo</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">modulo_backup</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TP2 ADC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

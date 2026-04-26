@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html lang="pt" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>modulo_catalogo &#8212; Documentação Biblioteca TP2 </title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/nature.css?v=279e0f84" />
+    <script src="../_static/documentation_options.js?v=103ffe9a"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/translations.js?v=beaedd51"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Pesquisar" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice Geral"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Código do módulo</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">modulo_catalogo</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Código fonte de modulo_catalogo</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Gestão do catálogo de livros (persistência em JSON).</span>
+
+<span class="sd">Este módulo expõe operações para o administrador manter o catálogo atualizado</span>
+<span class="sd">e para qualquer perfil listar os livros disponíveis para consulta.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># Caminho para o ficheiro JSON do catálogo.</span>
+<span class="n">_DADOS</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;livros.json&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_garantir_ficheiro</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Garante que a pasta e o ficheiro JSON do catálogo existem.</span>
+
+<span class="sd">    Se o ficheiro ainda não existir, é criado com uma lista vazia (`[]`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_DADOS</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_DADOS</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">_DADOS</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;[]&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="carregar_livros">
+<a class="viewcode-back" href="../modulo_catalogo.html#modulo_catalogo.carregar_livros">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">carregar_livros</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Carrega todos os livros do ficheiro de dados.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list[dict]: Lista de livros, onde cada livro contém:</span>
+<span class="sd">            - `id` (int)</span>
+<span class="sd">            - `titulo` (str)</span>
+<span class="sd">            - `autor` (str)</span>
+<span class="sd">            - `exemplares` (int)</span>
+<span class="sd">            - `tema` (str, opcional)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_garantir_ficheiro</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_DADOS</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_guardar_livros</span><span class="p">(</span><span class="n">livros</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Persiste a lista completa de livros no ficheiro JSON.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        livros (list[dict]): Lista de livros a gravar.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_DADOS</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">livros</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_proximo_id</span><span class="p">(</span><span class="n">livros</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calcula o próximo identificador sequencial para um livro.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        livros (list[dict]): Lista atual de livros.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: O próximo `id` (1 se a lista estiver vazia).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">livros</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">livros</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+
+<div class="viewcode-block" id="adicionar_livro">
+<a class="viewcode-back" href="../modulo_catalogo.html#modulo_catalogo.adicionar_livro">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">adicionar_livro</span><span class="p">(</span><span class="n">titulo</span><span class="p">,</span> <span class="n">autor</span><span class="p">,</span> <span class="n">exemplares</span><span class="p">,</span> <span class="n">tema</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Regista um novo livro no catálogo.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        titulo (str): Título do livro.</span>
+<span class="sd">        autor (str): Nome do autor.</span>
+<span class="sd">        exemplares (int): Número de exemplares físicos (&gt;= 1).</span>
+<span class="sd">        tema (str): Tema ou género (opcional), usado na pesquisa.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: O dicionário do livro criado e persistido.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">livros</span> <span class="o">=</span> <span class="n">carregar_livros</span><span class="p">()</span>
+    <span class="n">livro</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">_proximo_id</span><span class="p">(</span><span class="n">livros</span><span class="p">),</span>
+        <span class="s2">&quot;titulo&quot;</span><span class="p">:</span> <span class="n">titulo</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+        <span class="s2">&quot;autor&quot;</span><span class="p">:</span> <span class="n">autor</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+        <span class="s2">&quot;exemplares&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">exemplares</span><span class="p">),</span>
+        <span class="s2">&quot;tema&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">tema</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+    <span class="p">}</span>
+    <span class="n">livros</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">livro</span><span class="p">)</span>
+    <span class="n">_guardar_livros</span><span class="p">(</span><span class="n">livros</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">livro</span></div>
+
+
+
+<div class="viewcode-block" id="pesquisar_por_autor">
+<a class="viewcode-back" href="../modulo_catalogo.html#modulo_catalogo.pesquisar_por_autor">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pesquisar_por_autor</span><span class="p">(</span><span class="n">termo</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pesquisa livros por autor (correspondência parcial, case-insensitive).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        termo (str): Texto (parcial) a procurar no campo `autor`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list[dict]: Lista de livros cujo autor contém o `termo`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">termo</span> <span class="o">=</span> <span class="n">termo</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">termo</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">livro</span>
+        <span class="k">for</span> <span class="n">livro</span> <span class="ow">in</span> <span class="n">carregar_livros</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">termo</span> <span class="ow">in</span> <span class="n">livro</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;autor&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="pesquisar_por_tema">
+<a class="viewcode-back" href="../modulo_catalogo.html#modulo_catalogo.pesquisar_por_tema">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pesquisar_por_tema</span><span class="p">(</span><span class="n">termo</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pesquisa livros por tema/género (correspondência parcial).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        termo (str): Texto (parcial) a procurar no campo `tema`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list[dict]: Lista de livros cujo tema contém o `termo`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">termo</span> <span class="o">=</span> <span class="n">termo</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">termo</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">livro</span>
+        <span class="k">for</span> <span class="n">livro</span> <span class="ow">in</span> <span class="n">carregar_livros</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">termo</span> <span class="ow">in</span> <span class="n">livro</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tema&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="obter_livro">
+<a class="viewcode-back" href="../modulo_catalogo.html#modulo_catalogo.obter_livro">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">obter_livro</span><span class="p">(</span><span class="n">livro_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Obtém um livro pelo identificador.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        livro_id (int): Identificador do livro.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict | None: Dicionário do livro, ou `None` se não existir.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">livro</span> <span class="ow">in</span> <span class="n">carregar_livros</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">livro</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">livro_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">livro</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="atualizar_exemplares">
+<a class="viewcode-back" href="../modulo_catalogo.html#modulo_catalogo.atualizar_exemplares">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">atualizar_exemplares</span><span class="p">(</span><span class="n">livro_id</span><span class="p">,</span> <span class="n">novo_total</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Atualiza o número total de exemplares de um livro.</span>
+
+<span class="sd">    Nota: esta função **não** valida requisições ativas. Essa validação é feita</span>
+<span class="sd">    no fluxo do `main.py` antes de chamar este método (para garantir que o</span>
+<span class="sd">    stock não fica abaixo do número de exemplares atualmente emprestados).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        livro_id (int): Identificador do livro.</span>
+<span class="sd">        novo_total (int): Novo stock total (&gt;= 1).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple[bool, str]: Resultado da operação e mensagem para o utilizador.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">novo_total</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">novo_total</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">novo_total</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;O stock total tem de ser pelo menos 1.&quot;</span>
+    <span class="n">livros</span> <span class="o">=</span> <span class="n">carregar_livros</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">livro</span> <span class="ow">in</span> <span class="n">livros</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">livro</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">livro_id</span><span class="p">:</span>
+            <span class="n">livro</span><span class="p">[</span><span class="s2">&quot;exemplares&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">novo_total</span>
+            <span class="n">_guardar_livros</span><span class="p">(</span><span class="n">livros</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;Stock atualizado.&quot;</span>
+    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Livro não encontrado.&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="listar_catalogo_formatado">
+<a class="viewcode-back" href="../modulo_catalogo.html#modulo_catalogo.listar_catalogo_formatado">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">listar_catalogo_formatado</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Devolve linhas de texto com o catálogo completo para apresentação na</span>
+<span class="sd">    consola.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Texto com um livro por linha (id, título, autor, exemplares).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">livros</span> <span class="o">=</span> <span class="n">carregar_livros</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">livros</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;(Catálogo vazio — ainda não existem livros registados.)&quot;</span>
+    <span class="n">linhas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">livro</span> <span class="ow">in</span> <span class="n">livros</span><span class="p">:</span>
+        <span class="n">tema</span> <span class="o">=</span> <span class="n">livro</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tema&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; | Tema: </span><span class="si">{</span><span class="n">tema</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">tema</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">linhas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;  [</span><span class="si">{</span><span class="n">livro</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">livro</span><span class="p">[</span><span class="s1">&#39;titulo&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> — </span><span class="si">{</span><span class="n">livro</span><span class="p">[</span><span class="s1">&#39;autor&#39;</span><span class="p">]</span><span class="si">}{</span><span class="n">extra</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">livro</span><span class="p">[</span><span class="s1">&#39;exemplares&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> exemplar(es) no total)&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">linhas</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">listar_catalogo_formatado</span><span class="p">())</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Pesquisa rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice Geral"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Código do módulo</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">modulo_catalogo</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TP2 ADC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+
+<html lang="pt" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>modulo_requisicoes module &#8212; Documentação Biblioteca TP2 </title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=279e0f84" />
+    <script src="_static/documentation_options.js?v=103ffe9a"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/translations.js?v=beaedd51"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Pesquisar" href="search.html" />
+    <link rel="next" title="modulo_utilizadores module" href="modulo_utilizadores.html" />
+    <link rel="prev" title="modulo_catalogo module" href="modulo_catalogo.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice Geral"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="modulo_utilizadores.html" title="modulo_utilizadores module"
+             accesskey="N">próximo</a> |</li>
+        <li class="right" >
+          <a href="modulo_catalogo.html" title="modulo_catalogo module"
+             accesskey="P">anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">modulo_requisicoes module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-modulo_requisicoes">
+<span id="modulo-requisicoes-module"></span><h1>modulo_requisicoes module<a class="headerlink" href="#module-modulo_requisicoes" title="Link to this heading">¶</a></h1>
+<p>Requisições de exemplares da biblioteca.</p>
+<p>Permite requisitar e devolver livros, e listar requisições ativas para o
+administrador avaliar disponibilidade para novos requisitantes.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.carregar_requisicoes">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">carregar_requisicoes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#carregar_requisicoes"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.carregar_requisicoes" title="Link to this definition">¶</a></dt>
+<dd><p>Carrega todas as requisições a partir do ficheiro JSON.</p>
+<dl>
+<dt>Estrutura típica de uma requisição (registos recentes)::</dt><dd><dl class="simple">
+<dt>{</dt><dd><p>«id»: int,
+«livro_id»: int,
+«utilizador_id»: int,
+«requisitante»: str,
+«ativa»: bool,
+«data_requisicao»: «YYYY-MM-DD»,
+«data_limite»: «YYYY-MM-DD»</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+</dl>
+<p>Nota: podem existir registos antigos sem <cite>utilizador_id</cite> e/ou sem datas.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>list[dict]: Lista de requisições (ativas e concluídas).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.catalogo_disponibilidade_formatado">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">catalogo_disponibilidade_formatado</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#catalogo_disponibilidade_formatado"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.catalogo_disponibilidade_formatado" title="Link to this definition">¶</a></dt>
+<dd><p>Devolve o catálogo completo com disponibilidade calculada.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: Texto pronto a imprimir na consola.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.contar_requisicoes_ativas_por_livro">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">contar_requisicoes_ativas_por_livro</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">livro_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#contar_requisicoes_ativas_por_livro"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.contar_requisicoes_ativas_por_livro" title="Link to this definition">¶</a></dt>
+<dd><p>Conta quantas requisições ativas existem para um determinado livro.</p>
+<p>Cada registo ativo corresponde a um exemplar emprestado.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>livro_id (int): Identificador do livro.</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: Número de exemplares atualmente em requisição.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.devolver">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">devolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requisicao_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#devolver"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.devolver" title="Link to this definition">¶</a></dt>
+<dd><p>Encerra uma requisição ativa (regista a devolução do exemplar).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>requisicao_id (int): Identificador da requisição.</p>
+</dd>
+<dt>Returns:</dt><dd><p>tuple[bool, str]: Resultado da operação e mensagem.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.exemplares_disponiveis">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">exemplares_disponiveis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">livro_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#exemplares_disponiveis"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.exemplares_disponiveis" title="Link to this definition">¶</a></dt>
+<dd><p>Calcula quantos exemplares de um livro ainda podem ser requisitados.</p>
+<p>A disponibilidade é calculada como:
+<cite>exemplares_total - requisições_ativas</cite> (limitado a 0).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>livro_id (int): Identificador do livro.</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: Número de exemplares disponíveis (0 se o livro não existir).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.formatar_livros_com_disponibilidade">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">formatar_livros_com_disponibilidade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">livros</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#formatar_livros_com_disponibilidade"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.formatar_livros_com_disponibilidade" title="Link to this definition">¶</a></dt>
+<dd><p>Formata uma lista de livros (subconjunto do catálogo) com disponibilidade.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>livros (list[dict]): Livros a formatar (como devolvidos por pesquisas).</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: Texto pronto a imprimir.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.listar_por_utilizador">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">listar_por_utilizador</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">utilizador_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#listar_por_utilizador"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.listar_por_utilizador" title="Link to this definition">¶</a></dt>
+<dd><p>Lista requisições ativas de um utilizador (para escolher devolução).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>utilizador_id (int): Identificador do utilizador.</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: Texto formatado para consola.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.listar_requisitadas_admin">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">listar_requisitadas_admin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#listar_requisitadas_admin"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.listar_requisitadas_admin" title="Link to this definition">¶</a></dt>
+<dd><p>Lista requisições ativas para o administrador.</p>
+<p>Inclui:
+- identificador da requisição
+- título do livro
+- nome do requisitante
+- exemplares ainda disponíveis para terceiros
+- data limite (se existir e for válida)</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: Texto formatado para consola.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.listar_stock_por_livro_formatado">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">listar_stock_por_livro_formatado</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#listar_stock_por_livro_formatado"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.listar_stock_por_livro_formatado" title="Link to this definition">¶</a></dt>
+<dd><p>Formata um relatório de stock por livro.</p>
+<p>Para cada livro apresenta:
+- stock total no catálogo
+- quantos exemplares estão em requisição (requisições ativas)
+- quantos exemplares estão disponíveis</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: Texto pronto a imprimir na consola.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.prazos_minhas_requisicoes_formatado">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">prazos_minhas_requisicoes_formatado</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">utilizador_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#prazos_minhas_requisicoes_formatado"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.prazos_minhas_requisicoes_formatado" title="Link to this definition">¶</a></dt>
+<dd><p>Lista requisições ativas do utilizador e descreve o prazo de devolução.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>utilizador_id (int): Identificador do utilizador.</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: Texto formatado para consola.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.requisicao_pertence_a_utilizador">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">requisicao_pertence_a_utilizador</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">utilizador_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#requisicao_pertence_a_utilizador"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.requisicao_pertence_a_utilizador" title="Link to this definition">¶</a></dt>
+<dd><p>Valida se uma requisição pertence a um utilizador.</p>
+<p>A regra preferencial é por <cite>utilizador_id</cite>. Para compatibilidade com
+registos antigos (legados), se <cite>utilizador_id</cite> não existir no registo,
+valida por nome (<cite>requisitante</cite>).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>reg (dict): Registo de requisição.
+utilizador_id (int): Identificador do utilizador.</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: <cite>True</cite> se a requisição pertencer ao utilizador.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.requisitar">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">requisitar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">livro_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">utilizador_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#requisitar"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.requisitar" title="Link to this definition">¶</a></dt>
+<dd><p>Cria uma nova requisição ativa, se houver exemplar disponível.</p>
+<p>Este método valida:
+- existência do utilizador
+- existência do livro
+- disponibilidade (pelo menos 1 exemplar livre)</p>
+<p>Em caso de sucesso, grava a requisição com datas (hoje e data limite).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>livro_id (int): Identificador do livro.
+utilizador_id (int): Identificador do utilizador.</p>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>tuple[bool, str, dict | None]:</dt><dd><ul class="simple">
+<li><p>sucesso (bool)</p></li>
+<li><p>mensagem (str) para apresentação</p></li>
+<li><p>registo da requisição (dict) ou <cite>None</cite> em caso de erro</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.resumo_requisicoes_utilizador">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">resumo_requisicoes_utilizador</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">utilizador_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#resumo_requisicoes_utilizador"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.resumo_requisicoes_utilizador" title="Link to this definition">¶</a></dt>
+<dd><p>Gera um resumo textual das requisições de um utilizador.</p>
+<p>Inclui contagens de requisições ativas e concluídas e, se existirem
+requisições ativas, lista-as com o respetivo prazo.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>utilizador_id (int): Identificador do utilizador.</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: Texto formatado para a consola.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_requisicoes.texto_tempo_restante_devolucao">
+<span class="sig-prename descclassname"><span class="pre">modulo_requisicoes.</span></span><span class="sig-name descname"><span class="pre">texto_tempo_restante_devolucao</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_limite_iso</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_requisicoes.html#texto_tempo_restante_devolucao"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_requisicoes.texto_tempo_restante_devolucao" title="Link to this definition">¶</a></dt>
+<dd><p>Converte uma data limite (ISO) num texto amigável sobre o prazo.</p>
+<p>Este helper existe para manter a lógica de apresentação consistente em
+vários ecrãs/fluxos (listagens por utilizador e painel do administrador).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>data_limite_iso (str | None): Data em formato ISO (<cite>YYYY-MM-DD</cite>) ou</dt><dd><p><cite>None</cite>.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>str: Mensagem humana (dias restantes, último dia, ou atraso).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">modulo_requisicoes module</a><ul>
+<li><a class="reference internal" href="#modulo_requisicoes.carregar_requisicoes"><code class="docutils literal notranslate"><span class="pre">carregar_requisicoes()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_requisicoes.catalogo_disponibilidade_formatado"><code class="docutils literal notranslate"><span class="pre">catalogo_disponibilidade_formatado()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_requisicoes.contar_requisicoes_ativas_por_livro"><code class="docutils literal notranslate"><span class="pre">contar_requisicoes_ativas_por_livro()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_requisicoes.devolver"><code class="docutils literal notranslate"><span class="pre">devolver()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_requisicoes.exemplares_disponiveis"><code class="docutils literal notranslate"><span class="pre">exemplares_disponiveis()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_requisicoes.formatar_livros_com_disponibilidade"><code class="docutils literal notranslate"><span class="pre">formatar_livros_com_disponibilidade()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_requisicoes.listar_por_utilizador"><code class="docutils literal notranslate"><span class="pre">listar_por_utilizador()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_requisicoes.listar_requisitadas_admin"><code class="docutils literal notranslate"><span class="pre">listar_requisitadas_admin()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_requisicoes.listar_stock_por_livro_formatado"><code class="docutils literal notranslate"><span class="pre">listar_stock_por_livro_formatado()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_requisicoes.prazos_minhas_requisicoes_formatado"><code class="docutils literal notranslate"><span class="pre">prazos_minhas_requisicoes_formatado()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_requisicoes.requisicao_pertence_a_utilizador"><code class="docutils literal notranslate"><span class="pre">requisicao_pertence_a_utilizador()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_requisicoes.requisitar"><code class="docutils literal notranslate"><span class="pre">requisitar()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_requisicoes.resumo_requisicoes_utilizador"><code class="docutils literal notranslate"><span class="pre">resumo_requisicoes_utilizador()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_requisicoes.texto_tempo_restante_devolucao"><code class="docutils literal notranslate"><span class="pre">texto_tempo_restante_devolucao()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tópico anterior</h4>
+    <p class="topless"><a href="modulo_catalogo.html"
+                          title="capítulo anterior">modulo_catalogo module</a></p>
+  </div>
+  <div>
+    <h4>Próximo tópico</h4>
+    <p class="topless"><a href="modulo_utilizadores.html"
+                          title="próximo capítulo">modulo_utilizadores module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta Página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/modulo_requisicoes.rst.txt"
+            rel="nofollow">Exibir Fonte</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Pesquisa rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice Geral"
+             >índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="modulo_utilizadores.html" title="modulo_utilizadores module"
+             >próximo</a> |</li>
+        <li class="right" >
+          <a href="modulo_catalogo.html" title="modulo_catalogo module"
+             >anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">modulo_requisicoes module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TP2 ADC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

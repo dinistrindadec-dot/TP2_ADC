@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html lang="pt" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>modulo_catalogo module &#8212; Documentação Biblioteca TP2 </title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=279e0f84" />
+    <script src="_static/documentation_options.js?v=103ffe9a"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/translations.js?v=beaedd51"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Pesquisar" href="search.html" />
+    <link rel="next" title="modulo_requisicoes module" href="modulo_requisicoes.html" />
+    <link rel="prev" title="modulo_backup module" href="modulo_backup.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice Geral"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="modulo_requisicoes.html" title="modulo_requisicoes module"
+             accesskey="N">próximo</a> |</li>
+        <li class="right" >
+          <a href="modulo_backup.html" title="modulo_backup module"
+             accesskey="P">anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">modulo_catalogo module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-modulo_catalogo">
+<span id="modulo-catalogo-module"></span><h1>modulo_catalogo module<a class="headerlink" href="#module-modulo_catalogo" title="Link to this heading">¶</a></h1>
+<p>Gestão do catálogo de livros (persistência em JSON).</p>
+<p>Este módulo expõe operações para o administrador manter o catálogo atualizado
+e para qualquer perfil listar os livros disponíveis para consulta.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_catalogo.adicionar_livro">
+<span class="sig-prename descclassname"><span class="pre">modulo_catalogo.</span></span><span class="sig-name descname"><span class="pre">adicionar_livro</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">titulo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exemplares</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_catalogo.html#adicionar_livro"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_catalogo.adicionar_livro" title="Link to this definition">¶</a></dt>
+<dd><p>Regista um novo livro no catálogo.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>titulo (str): Título do livro.
+autor (str): Nome do autor.
+exemplares (int): Número de exemplares físicos (&gt;= 1).
+tema (str): Tema ou género (opcional), usado na pesquisa.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: O dicionário do livro criado e persistido.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_catalogo.atualizar_exemplares">
+<span class="sig-prename descclassname"><span class="pre">modulo_catalogo.</span></span><span class="sig-name descname"><span class="pre">atualizar_exemplares</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">livro_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">novo_total</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_catalogo.html#atualizar_exemplares"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_catalogo.atualizar_exemplares" title="Link to this definition">¶</a></dt>
+<dd><p>Atualiza o número total de exemplares de um livro.</p>
+<p>Nota: esta função <strong>não</strong> valida requisições ativas. Essa validação é feita
+no fluxo do <cite>main.py</cite> antes de chamar este método (para garantir que o
+stock não fica abaixo do número de exemplares atualmente emprestados).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>livro_id (int): Identificador do livro.
+novo_total (int): Novo stock total (&gt;= 1).</p>
+</dd>
+<dt>Returns:</dt><dd><p>tuple[bool, str]: Resultado da operação e mensagem para o utilizador.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_catalogo.carregar_livros">
+<span class="sig-prename descclassname"><span class="pre">modulo_catalogo.</span></span><span class="sig-name descname"><span class="pre">carregar_livros</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_catalogo.html#carregar_livros"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_catalogo.carregar_livros" title="Link to this definition">¶</a></dt>
+<dd><p>Carrega todos os livros do ficheiro de dados.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>list[dict]: Lista de livros, onde cada livro contém:</dt><dd><ul class="simple">
+<li><p><cite>id</cite> (int)</p></li>
+<li><p><cite>titulo</cite> (str)</p></li>
+<li><p><cite>autor</cite> (str)</p></li>
+<li><p><cite>exemplares</cite> (int)</p></li>
+<li><p><cite>tema</cite> (str, opcional)</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_catalogo.listar_catalogo_formatado">
+<span class="sig-prename descclassname"><span class="pre">modulo_catalogo.</span></span><span class="sig-name descname"><span class="pre">listar_catalogo_formatado</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_catalogo.html#listar_catalogo_formatado"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_catalogo.listar_catalogo_formatado" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Devolve linhas de texto com o catálogo completo para apresentação na</p>
+</div></blockquote>
+<p>consola.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: Texto com um livro por linha (id, título, autor, exemplares).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_catalogo.obter_livro">
+<span class="sig-prename descclassname"><span class="pre">modulo_catalogo.</span></span><span class="sig-name descname"><span class="pre">obter_livro</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">livro_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_catalogo.html#obter_livro"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_catalogo.obter_livro" title="Link to this definition">¶</a></dt>
+<dd><p>Obtém um livro pelo identificador.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>livro_id (int): Identificador do livro.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict | None: Dicionário do livro, ou <cite>None</cite> se não existir.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_catalogo.pesquisar_por_autor">
+<span class="sig-prename descclassname"><span class="pre">modulo_catalogo.</span></span><span class="sig-name descname"><span class="pre">pesquisar_por_autor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">termo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_catalogo.html#pesquisar_por_autor"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_catalogo.pesquisar_por_autor" title="Link to this definition">¶</a></dt>
+<dd><p>Pesquisa livros por autor (correspondência parcial, case-insensitive).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>termo (str): Texto (parcial) a procurar no campo <cite>autor</cite>.</p>
+</dd>
+<dt>Returns:</dt><dd><p>list[dict]: Lista de livros cujo autor contém o <cite>termo</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modulo_catalogo.pesquisar_por_tema">
+<span class="sig-prename descclassname"><span class="pre">modulo_catalogo.</span></span><span class="sig-name descname"><span class="pre">pesquisar_por_tema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">termo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modulo_catalogo.html#pesquisar_por_tema"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#modulo_catalogo.pesquisar_por_tema" title="Link to this definition">¶</a></dt>
+<dd><p>Pesquisa livros por tema/género (correspondência parcial).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>termo (str): Texto (parcial) a procurar no campo <cite>tema</cite>.</p>
+</dd>
+<dt>Returns:</dt><dd><p>list[dict]: Lista de livros cujo tema contém o <cite>termo</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">modulo_catalogo module</a><ul>
+<li><a class="reference internal" href="#modulo_catalogo.adicionar_livro"><code class="docutils literal notranslate"><span class="pre">adicionar_livro()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_catalogo.atualizar_exemplares"><code class="docutils literal notranslate"><span class="pre">atualizar_exemplares()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_catalogo.carregar_livros"><code class="docutils literal notranslate"><span class="pre">carregar_livros()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_catalogo.listar_catalogo_formatado"><code class="docutils literal notranslate"><span class="pre">listar_catalogo_formatado()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_catalogo.obter_livro"><code class="docutils literal notranslate"><span class="pre">obter_livro()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_catalogo.pesquisar_por_autor"><code class="docutils literal notranslate"><span class="pre">pesquisar_por_autor()</span></code></a></li>
+<li><a class="reference internal" href="#modulo_catalogo.pesquisar_por_tema"><code class="docutils literal notranslate"><span class="pre">pesquisar_por_tema()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tópico anterior</h4>
+    <p class="topless"><a href="modulo_backup.html"
+                          title="capítulo anterior">modulo_backup module</a></p>
+  </div>
+  <div>
+    <h4>Próximo tópico</h4>
+    <p class="topless"><a href="modulo_requisicoes.html"
+                          title="próximo capítulo">modulo_requisicoes module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta Página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/modulo_catalogo.rst.txt"
+            rel="nofollow">Exibir Fonte</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Pesquisa rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice Geral"
+             >índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="modulo_requisicoes.html" title="modulo_requisicoes module"
+             >próximo</a> |</li>
+        <li class="right" >
+          <a href="modulo_backup.html" title="modulo_backup module"
+             >anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">modulo_catalogo module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TP2 ADC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

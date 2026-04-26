@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+
+<html lang="pt" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>main &#8212; Documentação Biblioteca TP2 </title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/nature.css?v=279e0f84" />
+    <script src="../_static/documentation_options.js?v=103ffe9a"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/translations.js?v=beaedd51"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Pesquisar" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice Geral"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Código do módulo</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">main</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Código fonte de main</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Aplicação de gestão de biblioteca (catálogo e requisições)</span>
+<span class="sd">---------------------------------------------------------</span>
+
+<span class="sd">Programa principal com menus interativos para o administrador</span>
+<span class="sd">(criar livros, ver requisições) e para leitores (consultar catálogo,</span>
+<span class="sd">requisitar e devolver).</span>
+
+<span class="sd">Os módulos ``modulo_catalogo``, ``modulo_requisicoes``, ``modulo_utilizadores``</span>
+<span class="sd">e ``modulo_backup`` concentram a lógica de negócio e a persistência em ficheiros JSON.</span>
+
+<span class="sd">:Autor: TP2 ADC</span>
+<span class="sd">:Versão: 1.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># Garante que `src/` está no `sys.path` quando o programa é executado</span>
+<span class="c1"># diretamente, permitindo `import modulo_*` sem instalar o projeto como pacote.</span>
+<span class="n">_SRC</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">_SRC</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">_SRC</span><span class="p">))</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">modulo_backup</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">modulo_catalogo</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">modulo_requisicoes</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">modulo_utilizadores</span>
+
+
+<div class="viewcode-block" id="menu_principal">
+<a class="viewcode-back" href="../main.html#main.menu_principal">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">menu_principal</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Menu inicial: escolha do perfil.</span>
+
+<span class="sd">    O ciclo repete até receber uma opção válida.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: 1 (administrador), 2 (leitor) ou 3 (sair).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- Biblioteca ---&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;1. Administrador&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2. Leitor&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;3. Sair&quot;</span><span class="p">)</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Opção: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Opção inválida.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="menu_admin">
+<a class="viewcode-back" href="../main.html#main.menu_admin">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">menu_admin</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Menu do administrador.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    int: Opção selecionada (1..8).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- Administrador ---&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;1. Criar livro (atualizar catálogo)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2. Ver livros requisitados (requisições ativas)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;3. Consultar catálogo completo&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;4. Registar utilizador&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;5. Fichas de utilizadores&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;6. Stock dos livros (ver / alterar quantidade)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;7. Criar backup dos dados (cópia de segurança)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;8. Voltar&quot;</span><span class="p">)</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Opção: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span> <span class="s2">&quot;6&quot;</span><span class="p">,</span> <span class="s2">&quot;7&quot;</span><span class="p">,</span> <span class="s2">&quot;8&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Opção inválida.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="menu_leitor">
+<a class="viewcode-back" href="../main.html#main.menu_leitor">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">menu_leitor</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Menu do leitor.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Opção selecionada (1..7).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- Leitor ---&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;1. Consultar catálogo (disponível / emprestado)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2. Requisitar livro&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;3. Devolver livro&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;4. Prazos das minhas requisições (tempo até devolução)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;5. Pesquisar livros (por autor ou por tema)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;6. Atualizar e-mail ou telemóvel (contactos)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;7. Voltar&quot;</span><span class="p">)</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Opção: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span> <span class="s2">&quot;6&quot;</span><span class="p">,</span> <span class="s2">&quot;7&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Opção inválida.&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_pedir_inteiro_positivo</span><span class="p">(</span><span class="n">mensagem</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pede um inteiro ao utilizador e valida que é &gt;= 1.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mensagem (str): Texto a apresentar no `input()`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Inteiro validado (&gt;= 1).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="n">mensagem</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">v</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Introduza um número inteiro &gt;= 1.&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_pedir_inteiro_minimo</span><span class="p">(</span><span class="n">mensagem</span><span class="p">,</span> <span class="n">minimo</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pede um inteiro ao utilizador e valida que é &gt;= `minimo`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mensagem (str): Texto a apresentar no `input()`.</span>
+<span class="sd">        minimo (int): Valor mínimo aceite.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Inteiro validado (&gt;= `minimo`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="n">mensagem</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="n">minimo</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">v</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Introduza um número inteiro &gt;= </span><span class="si">{</span><span class="n">minimo</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="fluxo_admin_criar_livro">
+<a class="viewcode-back" href="../main.html#main.fluxo_admin_criar_livro">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fluxo_admin_criar_livro</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluxo do administrador: registo de um novo livro no catálogo.</span>
+
+<span class="sd">    Solicita título/autor (obrigatórios), número de exemplares (&gt;= 1) e um tema</span>
+<span class="sd">    opcional para permitir pesquisa.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">titulo</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Título: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">autor</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Autor: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">titulo</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">autor</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Título e autor são obrigatórios.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">exemplares</span> <span class="o">=</span> <span class="n">_pedir_inteiro_positivo</span><span class="p">(</span><span class="s2">&quot;Número de exemplares: &quot;</span><span class="p">)</span>
+    <span class="n">tema</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Tema / género (opcional, para pesquisa): &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">livro</span> <span class="o">=</span> <span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">adicionar_livro</span><span class="p">(</span><span class="n">titulo</span><span class="p">,</span> <span class="n">autor</span><span class="p">,</span> <span class="n">exemplares</span><span class="p">,</span> <span class="n">tema</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Livro criado com id </span><span class="si">{</span><span class="n">livro</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">. Catálogo atualizado.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="fluxo_admin_ver_requisitados">
+<a class="viewcode-back" href="../main.html#main.fluxo_admin_ver_requisitados">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fluxo_admin_ver_requisitados</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluxo do administrador: listagem de requisições ativas.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Requisições atuais (exemplares em requisição):&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">modulo_requisicoes</span><span class="o">.</span><span class="n">listar_requisitadas_admin</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="fluxo_admin_catalogo">
+<a class="viewcode-back" href="../main.html#main.fluxo_admin_catalogo">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fluxo_admin_catalogo</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluxo do administrador: listagem do catálogo completo.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Catálogo:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">listar_catalogo_formatado</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="fluxo_admin_registar_utilizador">
+<a class="viewcode-back" href="../main.html#main.fluxo_admin_registar_utilizador">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fluxo_admin_registar_utilizador</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluxo do administrador: registo de um novo utilizador.</span>
+
+<span class="sd">    O nome é obrigatório. E-mail e telefone são opcionais.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nome</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Nome completo: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nome</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;O nome é obrigatório.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;E-mail (opcional): &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">telefone</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Telefone (opcional): &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">adicionar_utilizador</span><span class="p">(</span><span class="n">nome</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">telefone</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Utilizador registado com id </span><span class="si">{</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="fluxo_admin_fichas">
+<a class="viewcode-back" href="../main.html#main.fluxo_admin_fichas">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fluxo_admin_fichas</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluxo do administrador: consulta da ficha de um utilizador.</span>
+
+<span class="sd">    Mostra o índice de utilizadores e pede o `id` para apresentar a ficha</span>
+<span class="sd">    detalhada (incluindo resumo de requisições).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Utilizadores:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">listar_indice_formatado</span><span class="p">())</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">uid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Id do utilizador para ver a ficha: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Id inválido.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="nb">print</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">ficha_formatada</span><span class="p">(</span><span class="n">uid</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="fluxo_admin_stock">
+<a class="viewcode-back" href="../main.html#main.fluxo_admin_stock">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fluxo_admin_stock</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluxo do administrador: gestão de stock (nº exemplares por livro).</span>
+
+<span class="sd">    Este fluxo consulta o stock atual e permite alterar o número total de</span>
+<span class="sd">    exemplares de um livro. Antes de alterar, valida que o novo stock não fica</span>
+<span class="sd">    abaixo do número de exemplares atualmente requisitados.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Stock por livro (total | em requisição | disponível):&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">modulo_requisicoes</span><span class="o">.</span><span class="n">listar_stock_por_livro_formatado</span><span class="p">())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;1. Alterar stock (número de exemplares) de um livro&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2. Voltar&quot;</span><span class="p">)</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Opção: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;2&quot;</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="o">!=</span> <span class="s2">&quot;1&quot;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Opção inválida.&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">lid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Id do livro: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Id inválido.&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">obter_livro</span><span class="p">(</span><span class="n">lid</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Livro não encontrado.&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        
+        <span class="c1"># `em_uso` define o mínimo permitido: não podemos ter menos stock do que</span>
+        <span class="c1"># exemplares já emprestados.</span>
+        <span class="n">em_uso</span> <span class="o">=</span> <span class="n">modulo_requisicoes</span><span class="o">.</span><span class="n">contar_requisicoes_ativas_por_livro</span><span class="p">(</span><span class="n">lid</span><span class="p">)</span>
+        <span class="n">minimo</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">em_uso</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Novo total de exemplares (não pode ser inferior a </span><span class="si">{</span><span class="n">minimo</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;porque </span><span class="si">{</span><span class="n">em_uso</span><span class="si">}</span><span class="s2"> estão em requisição).&quot;</span>
+        <span class="p">)</span>
+        <span class="n">novo</span> <span class="o">=</span> <span class="n">_pedir_inteiro_minimo</span><span class="p">(</span><span class="s2">&quot;Novo stock total: &quot;</span><span class="p">,</span> <span class="n">minimo</span><span class="p">)</span>
+        <span class="n">ok</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">atualizar_exemplares</span><span class="p">(</span><span class="n">lid</span><span class="p">,</span> <span class="n">novo</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="fluxo_leitor_catalogo">
+<a class="viewcode-back" href="../main.html#main.fluxo_leitor_catalogo">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fluxo_leitor_catalogo</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluxo do leitor: consulta do catálogo com disponibilidade.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Catálogo com disponibilidade para requisição:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">modulo_requisicoes</span><span class="o">.</span><span class="n">catalogo_disponibilidade_formatado</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="fluxo_leitor_requisitar">
+<a class="viewcode-back" href="../main.html#main.fluxo_leitor_requisitar">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fluxo_leitor_requisitar</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluxo do leitor: criação de uma requisição de livro.</span>
+
+<span class="sd">    O leitor escolhe o seu `id` de utilizador e depois seleciona o livro a</span>
+<span class="sd">    requisitar. A criação e validações são delegadas a `modulo_requisicoes`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Utilizadores registados:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">listar_indice_formatado</span><span class="p">())</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">uid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;O seu id de utilizador: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Id inválido.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">obter_utilizador</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Utilizador não encontrado.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Disponibilidade:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">modulo_requisicoes</span><span class="o">.</span><span class="n">catalogo_disponibilidade_formatado</span><span class="p">())</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">lid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Id do livro a requisitar: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Id inválido.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">ok</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">modulo_requisicoes</span><span class="o">.</span><span class="n">requisitar</span><span class="p">(</span><span class="n">lid</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="fluxo_leitor_devolver">
+<a class="viewcode-back" href="../main.html#main.fluxo_leitor_devolver">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fluxo_leitor_devolver</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluxo do leitor: devolução de um livro (encerra uma requisição).</span>
+
+<span class="sd">    Mostra as requisições ativas do utilizador e pede o `#id` da requisição</span>
+<span class="sd">    para efetuar a devolução.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Utilizadores registados:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">listar_indice_formatado</span><span class="p">())</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">uid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;O seu id de utilizador: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Id inválido.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">obter_utilizador</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Utilizador não encontrado.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">As suas requisições ativas:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">modulo_requisicoes</span><span class="o">.</span><span class="n">listar_por_utilizador</span><span class="p">(</span><span class="n">uid</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">rid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Número da requisição a devolver (#id): &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Valor inválido.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">regs</span> <span class="o">=</span> <span class="n">modulo_requisicoes</span><span class="o">.</span><span class="n">carregar_requisicoes</span><span class="p">()</span>
+    <span class="n">reg</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">regs</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">rid</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">reg</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">modulo_requisicoes</span><span class="o">.</span><span class="n">requisicao_pertence_a_utilizador</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">uid</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Essa requisição não existe ou não pertence a este utilizador.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">ok</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">modulo_requisicoes</span><span class="o">.</span><span class="n">devolver</span><span class="p">(</span><span class="n">rid</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="fluxo_leitor_prazos">
+<a class="viewcode-back" href="../main.html#main.fluxo_leitor_prazos">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fluxo_leitor_prazos</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluxo do leitor: consulta dos prazos das requisições ativas.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Utilizadores registados:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">listar_indice_formatado</span><span class="p">())</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">uid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;O seu id de utilizador: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Id inválido.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">obter_utilizador</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Utilizador não encontrado.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">As suas requisições ativas e tempo até à devolução:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">modulo_requisicoes</span><span class="o">.</span><span class="n">prazos_minhas_requisicoes_formatado</span><span class="p">(</span><span class="n">uid</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="fluxo_leitor_pesquisar">
+<a class="viewcode-back" href="../main.html#main.fluxo_leitor_pesquisar">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fluxo_leitor_pesquisar</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluxo do leitor: pesquisa de livros por autor ou tema.</span>
+
+<span class="sd">    A pesquisa é feita no catálogo e, em seguida, os resultados são formatados</span>
+<span class="sd">    com disponibilidade (usando as requisições ativas).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Pesquisa (texto parcial, ignora maiúsculas):&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;1. Por autor&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2. Por tema&quot;</span><span class="p">)</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Opção: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">termo</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Texto a procurar: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">termo</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Indique um termo de pesquisa.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;1&quot;</span><span class="p">:</span>
+        <span class="n">livros</span> <span class="o">=</span> <span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">pesquisar_por_autor</span><span class="p">(</span><span class="n">termo</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;2&quot;</span><span class="p">:</span>
+        <span class="n">livros</span> <span class="o">=</span> <span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">pesquisar_por_tema</span><span class="p">(</span><span class="n">termo</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Opção inválida.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Resultados:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">modulo_requisicoes</span><span class="o">.</span><span class="n">formatar_livros_com_disponibilidade</span><span class="p">(</span><span class="n">livros</span><span class="p">))</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_pedir_novo_contacto</span><span class="p">(</span><span class="n">rotulo</span><span class="p">,</span> <span class="n">valor_atual</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pede ao utilizador um novo valor para um campo de contacto.</span>
+
+<span class="sd">    Regras:</span>
+<span class="sd">    - Enter mantém o valor atual.</span>
+<span class="sd">    - `-` apaga o valor.</span>
+<span class="sd">    - Qualquer outro texto substitui o valor.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rotulo (str): Nome a apresentar (ex.: &quot;E-mail&quot;).</span>
+<span class="sd">        valor_atual (str): Valor atual do campo.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Novo valor (pode ser vazio para representar remoção).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">atual_txt</span> <span class="o">=</span> <span class="n">valor_atual</span> <span class="k">if</span> <span class="n">valor_atual</span> <span class="k">else</span> <span class="s2">&quot;—&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rotulo</span><span class="si">}</span><span class="s2"> atual: </span><span class="si">{</span><span class="n">atual_txt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;(Enter para manter, &#39;-&#39; para apagar, ou escreva o novo valor)&quot;</span><span class="p">)</span>
+    <span class="n">linha</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Novo </span><span class="si">{</span><span class="n">rotulo</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">linha</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">valor_atual</span>
+    <span class="k">if</span> <span class="n">linha</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">linha</span>
+
+
+<div class="viewcode-block" id="fluxo_leitor_contactos">
+<a class="viewcode-back" href="../main.html#main.fluxo_leitor_contactos">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fluxo_leitor_contactos</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluxo do leitor: atualização de contactos (e-mail e telemóvel).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Utilizadores registados:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">listar_indice_formatado</span><span class="p">())</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">uid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;O seu id de utilizador: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Id inválido.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">obter_utilizador</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Utilizador não encontrado.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">_pedir_novo_contacto</span><span class="p">(</span><span class="s2">&quot;E-mail&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+    <span class="n">telefone</span> <span class="o">=</span> <span class="n">_pedir_novo_contacto</span><span class="p">(</span><span class="s2">&quot;Telemóvel&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;telefone&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">email</span> <span class="o">==</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">telefone</span> <span class="o">==</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;telefone&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Nenhuma alteração.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">ok</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">atualizar_contactos</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">telefone</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="fluxo_admin_backup">
+<a class="viewcode-back" href="../main.html#main.fluxo_admin_backup">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fluxo_admin_backup</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluxo do administrador: criação de backup dos ficheiros de dados.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pasta</span><span class="p">,</span> <span class="n">ficheiros</span> <span class="o">=</span> <span class="n">modulo_backup</span><span class="o">.</span><span class="n">criar_backup</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Não foi possível criar o backup: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ficheiros</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Não foi copiado nenhum ficheiro (ainda não existem dados em &quot;</span>
+            <span class="s2">&quot;livros.json, requisicoes.json ou utilizadores.json).&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Backup criado com sucesso em:</span><span class="se">\n</span><span class="s2">  </span><span class="si">{</span><span class="n">pasta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ficheiros copiados: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ficheiros</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="painel_admin">
+<a class="viewcode-back" href="../main.html#main.painel_admin">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">painel_admin</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Loop principal do painel do administrador.</span>
+
+<span class="sd">    Executa o menu e despacha para o fluxo correspondente, até o utilizador</span>
+<span class="sd">    escolher &quot;Voltar&quot;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">menu_admin</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">fluxo_admin_criar_livro</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">fluxo_admin_ver_requisitados</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">fluxo_admin_catalogo</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">fluxo_admin_registar_utilizador</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">fluxo_admin_fichas</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">fluxo_admin_stock</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="n">fluxo_admin_backup</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">break</span></div>
+
+
+
+<div class="viewcode-block" id="painel_leitor">
+<a class="viewcode-back" href="../main.html#main.painel_leitor">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">painel_leitor</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Loop principal do painel do leitor.</span>
+
+<span class="sd">    Executa o menu e despacha para o fluxo correspondente, até o utilizador</span>
+<span class="sd">    escolher &quot;Voltar&quot;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">menu_leitor</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">fluxo_leitor_catalogo</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">fluxo_leitor_requisitar</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">fluxo_leitor_devolver</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">fluxo_leitor_prazos</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">fluxo_leitor_pesquisar</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">fluxo_leitor_contactos</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">break</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../main.html#main.main">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ponto de entrada: ciclo de menus até sair.</span>
+
+<span class="sd">    :rtype: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">menu_principal</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">painel_admin</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">painel_leitor</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Até breve.&quot;</span><span class="p">)</span>
+            <span class="k">break</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Pesquisa rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice Geral"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Código do módulo</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">main</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TP2 ADC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

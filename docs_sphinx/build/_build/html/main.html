@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html lang="pt" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>main module &#8212; Documentação Biblioteca TP2 </title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=279e0f84" />
+    <script src="_static/documentation_options.js?v=103ffe9a"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/translations.js?v=beaedd51"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Pesquisar" href="search.html" />
+    <link rel="next" title="modulo_backup module" href="modulo_backup.html" />
+    <link rel="prev" title="Documentação" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice Geral"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="modulo_backup.html" title="modulo_backup module"
+             accesskey="N">próximo</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Documentação"
+             accesskey="P">anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">main module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-main">
+<span id="main-module"></span><h1>main module<a class="headerlink" href="#module-main" title="Link to this heading">¶</a></h1>
+<section id="aplicacao-de-gestao-de-biblioteca-catalogo-e-requisicoes">
+<h2>Aplicação de gestão de biblioteca (catálogo e requisições)<a class="headerlink" href="#aplicacao-de-gestao-de-biblioteca-catalogo-e-requisicoes" title="Link to this heading">¶</a></h2>
+<p>Programa principal com menus interativos para o administrador
+(criar livros, ver requisições) e para leitores (consultar catálogo,
+requisitar e devolver).</p>
+<p>Os módulos <code class="docutils literal notranslate"><span class="pre">modulo_catalogo</span></code>, <code class="docutils literal notranslate"><span class="pre">modulo_requisicoes</span></code>, <code class="docutils literal notranslate"><span class="pre">modulo_utilizadores</span></code>
+e <code class="docutils literal notranslate"><span class="pre">modulo_backup</span></code> concentram a lógica de negócio e a persistência em ficheiros JSON.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Autor<span class="colon">:</span></dt>
+<dd class="field-odd"><p>TP2 ADC</p>
+</dd>
+<dt class="field-even">Versão<span class="colon">:</span></dt>
+<dd class="field-even"><p>1.0</p>
+</dd>
+</dl>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="main.fluxo_admin_backup">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">fluxo_admin_backup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#fluxo_admin_backup"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.fluxo_admin_backup" title="Link to this definition">¶</a></dt>
+<dd><p>Fluxo do administrador: criação de backup dos ficheiros de dados.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.fluxo_admin_catalogo">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">fluxo_admin_catalogo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#fluxo_admin_catalogo"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.fluxo_admin_catalogo" title="Link to this definition">¶</a></dt>
+<dd><p>Fluxo do administrador: listagem do catálogo completo.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.fluxo_admin_criar_livro">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">fluxo_admin_criar_livro</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#fluxo_admin_criar_livro"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.fluxo_admin_criar_livro" title="Link to this definition">¶</a></dt>
+<dd><p>Fluxo do administrador: registo de um novo livro no catálogo.</p>
+<p>Solicita título/autor (obrigatórios), número de exemplares (&gt;= 1) e um tema
+opcional para permitir pesquisa.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.fluxo_admin_fichas">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">fluxo_admin_fichas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#fluxo_admin_fichas"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.fluxo_admin_fichas" title="Link to this definition">¶</a></dt>
+<dd><p>Fluxo do administrador: consulta da ficha de um utilizador.</p>
+<p>Mostra o índice de utilizadores e pede o <cite>id</cite> para apresentar a ficha
+detalhada (incluindo resumo de requisições).</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.fluxo_admin_registar_utilizador">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">fluxo_admin_registar_utilizador</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#fluxo_admin_registar_utilizador"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.fluxo_admin_registar_utilizador" title="Link to this definition">¶</a></dt>
+<dd><p>Fluxo do administrador: registo de um novo utilizador.</p>
+<p>O nome é obrigatório. E-mail e telefone são opcionais.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.fluxo_admin_stock">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">fluxo_admin_stock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#fluxo_admin_stock"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.fluxo_admin_stock" title="Link to this definition">¶</a></dt>
+<dd><p>Fluxo do administrador: gestão de stock (nº exemplares por livro).</p>
+<p>Este fluxo consulta o stock atual e permite alterar o número total de
+exemplares de um livro. Antes de alterar, valida que o novo stock não fica
+abaixo do número de exemplares atualmente requisitados.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.fluxo_admin_ver_requisitados">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">fluxo_admin_ver_requisitados</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#fluxo_admin_ver_requisitados"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.fluxo_admin_ver_requisitados" title="Link to this definition">¶</a></dt>
+<dd><p>Fluxo do administrador: listagem de requisições ativas.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.fluxo_leitor_catalogo">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">fluxo_leitor_catalogo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#fluxo_leitor_catalogo"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.fluxo_leitor_catalogo" title="Link to this definition">¶</a></dt>
+<dd><p>Fluxo do leitor: consulta do catálogo com disponibilidade.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.fluxo_leitor_contactos">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">fluxo_leitor_contactos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#fluxo_leitor_contactos"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.fluxo_leitor_contactos" title="Link to this definition">¶</a></dt>
+<dd><p>Fluxo do leitor: atualização de contactos (e-mail e telemóvel).</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.fluxo_leitor_devolver">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">fluxo_leitor_devolver</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#fluxo_leitor_devolver"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.fluxo_leitor_devolver" title="Link to this definition">¶</a></dt>
+<dd><p>Fluxo do leitor: devolução de um livro (encerra uma requisição).</p>
+<p>Mostra as requisições ativas do utilizador e pede o <cite>#id</cite> da requisição
+para efetuar a devolução.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.fluxo_leitor_pesquisar">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">fluxo_leitor_pesquisar</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#fluxo_leitor_pesquisar"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.fluxo_leitor_pesquisar" title="Link to this definition">¶</a></dt>
+<dd><p>Fluxo do leitor: pesquisa de livros por autor ou tema.</p>
+<p>A pesquisa é feita no catálogo e, em seguida, os resultados são formatados
+com disponibilidade (usando as requisições ativas).</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.fluxo_leitor_prazos">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">fluxo_leitor_prazos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#fluxo_leitor_prazos"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.fluxo_leitor_prazos" title="Link to this definition">¶</a></dt>
+<dd><p>Fluxo do leitor: consulta dos prazos das requisições ativas.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.fluxo_leitor_requisitar">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">fluxo_leitor_requisitar</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#fluxo_leitor_requisitar"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.fluxo_leitor_requisitar" title="Link to this definition">¶</a></dt>
+<dd><p>Fluxo do leitor: criação de uma requisição de livro.</p>
+<p>O leitor escolhe o seu <cite>id</cite> de utilizador e depois seleciona o livro a
+requisitar. A criação e validações são delegadas a <cite>modulo_requisicoes</cite>.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.main">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#main"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.main" title="Link to this definition">¶</a></dt>
+<dd><p>Ponto de entrada: ciclo de menus até sair.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Tipo de retorno<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.menu_admin">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">menu_admin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#menu_admin"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.menu_admin" title="Link to this definition">¶</a></dt>
+<dd><p>Menu do administrador.</p>
+<p>Returns:
+int: Opção selecionada (1..8).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.menu_leitor">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">menu_leitor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#menu_leitor"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.menu_leitor" title="Link to this definition">¶</a></dt>
+<dd><p>Menu do leitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Opção selecionada (1..7).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.menu_principal">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">menu_principal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#menu_principal"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.menu_principal" title="Link to this definition">¶</a></dt>
+<dd><p>Menu inicial: escolha do perfil.</p>
+<p>O ciclo repete até receber uma opção válida.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: 1 (administrador), 2 (leitor) ou 3 (sair).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.painel_admin">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">painel_admin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#painel_admin"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.painel_admin" title="Link to this definition">¶</a></dt>
+<dd><p>Loop principal do painel do administrador.</p>
+<p>Executa o menu e despacha para o fluxo correspondente, até o utilizador
+escolher «Voltar».</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.painel_leitor">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">painel_leitor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#painel_leitor"><span class="viewcode-link"><span class="pre">[código</span> <span class="pre">fonte]</span></span></a><a class="headerlink" href="#main.painel_leitor" title="Link to this definition">¶</a></dt>
+<dd><p>Loop principal do painel do leitor.</p>
+<p>Executa o menu e despacha para o fluxo correspondente, até o utilizador
+escolher «Voltar».</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">main module</a><ul>
+<li><a class="reference internal" href="#aplicacao-de-gestao-de-biblioteca-catalogo-e-requisicoes">Aplicação de gestão de biblioteca (catálogo e requisições)</a></li>
+<li><a class="reference internal" href="#main.fluxo_admin_backup"><code class="docutils literal notranslate"><span class="pre">fluxo_admin_backup()</span></code></a></li>
+<li><a class="reference internal" href="#main.fluxo_admin_catalogo"><code class="docutils literal notranslate"><span class="pre">fluxo_admin_catalogo()</span></code></a></li>
+<li><a class="reference internal" href="#main.fluxo_admin_criar_livro"><code class="docutils literal notranslate"><span class="pre">fluxo_admin_criar_livro()</span></code></a></li>
+<li><a class="reference internal" href="#main.fluxo_admin_fichas"><code class="docutils literal notranslate"><span class="pre">fluxo_admin_fichas()</span></code></a></li>
+<li><a class="reference internal" href="#main.fluxo_admin_registar_utilizador"><code class="docutils literal notranslate"><span class="pre">fluxo_admin_registar_utilizador()</span></code></a></li>
+<li><a class="reference internal" href="#main.fluxo_admin_stock"><code class="docutils literal notranslate"><span class="pre">fluxo_admin_stock()</span></code></a></li>
+<li><a class="reference internal" href="#main.fluxo_admin_ver_requisitados"><code class="docutils literal notranslate"><span class="pre">fluxo_admin_ver_requisitados()</span></code></a></li>
+<li><a class="reference internal" href="#main.fluxo_leitor_catalogo"><code class="docutils literal notranslate"><span class="pre">fluxo_leitor_catalogo()</span></code></a></li>
+<li><a class="reference internal" href="#main.fluxo_leitor_contactos"><code class="docutils literal notranslate"><span class="pre">fluxo_leitor_contactos()</span></code></a></li>
+<li><a class="reference internal" href="#main.fluxo_leitor_devolver"><code class="docutils literal notranslate"><span class="pre">fluxo_leitor_devolver()</span></code></a></li>
+<li><a class="reference internal" href="#main.fluxo_leitor_pesquisar"><code class="docutils literal notranslate"><span class="pre">fluxo_leitor_pesquisar()</span></code></a></li>
+<li><a class="reference internal" href="#main.fluxo_leitor_prazos"><code class="docutils literal notranslate"><span class="pre">fluxo_leitor_prazos()</span></code></a></li>
+<li><a class="reference internal" href="#main.fluxo_leitor_requisitar"><code class="docutils literal notranslate"><span class="pre">fluxo_leitor_requisitar()</span></code></a></li>
+<li><a class="reference internal" href="#main.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li><a class="reference internal" href="#main.menu_admin"><code class="docutils literal notranslate"><span class="pre">menu_admin()</span></code></a></li>
+<li><a class="reference internal" href="#main.menu_leitor"><code class="docutils literal notranslate"><span class="pre">menu_leitor()</span></code></a></li>
+<li><a class="reference internal" href="#main.menu_principal"><code class="docutils literal notranslate"><span class="pre">menu_principal()</span></code></a></li>
+<li><a class="reference internal" href="#main.painel_admin"><code class="docutils literal notranslate"><span class="pre">painel_admin()</span></code></a></li>
+<li><a class="reference internal" href="#main.painel_leitor"><code class="docutils literal notranslate"><span class="pre">painel_leitor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tópico anterior</h4>
+    <p class="topless"><a href="index.html"
+                          title="capítulo anterior">Documentação</a></p>
+  </div>
+  <div>
+    <h4>Próximo tópico</h4>
+    <p class="topless"><a href="modulo_backup.html"
+                          title="próximo capítulo">modulo_backup module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta Página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/main.rst.txt"
+            rel="nofollow">Exibir Fonte</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Pesquisa rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice Geral"
+             >índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="modulo_backup.html" title="modulo_backup module"
+             >próximo</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Documentação"
+             >anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">main module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TP2 ADC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

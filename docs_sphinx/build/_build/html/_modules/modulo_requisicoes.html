@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+
+<html lang="pt" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>modulo_requisicoes &#8212; Documentação Biblioteca TP2 </title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/nature.css?v=279e0f84" />
+    <script src="../_static/documentation_options.js?v=103ffe9a"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/translations.js?v=beaedd51"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Pesquisar" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice Geral"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Código do módulo</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">modulo_requisicoes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Código fonte de modulo_requisicoes</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Requisições de exemplares da biblioteca.</span>
+
+<span class="sd">Permite requisitar e devolver livros, e listar requisições ativas para o</span>
+<span class="sd">administrador avaliar disponibilidade para novos requisitantes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">modulo_catalogo</span>
+
+<span class="n">_DADOS</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;requisicoes.json&quot;</span>
+
+<span class="c1"># Prazo de devolução contado a partir da data da requisição (novas requisições).</span>
+<span class="n">DIAS_PRAZO_EMPRESTIMO</span> <span class="o">=</span> <span class="mi">14</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_garantir_ficheiro</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Garante que a pasta e o ficheiro JSON de requisições existem.</span>
+
+<span class="sd">    Se o ficheiro ainda não existir, cria-o com uma lista vazia (`[]`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_DADOS</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_DADOS</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">_DADOS</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;[]&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="carregar_requisicoes">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.carregar_requisicoes">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">carregar_requisicoes</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Carrega todas as requisições a partir do ficheiro JSON.</span>
+
+<span class="sd">    Estrutura típica de uma requisição (registos recentes)::</span>
+<span class="sd">        {</span>
+<span class="sd">          &quot;id&quot;: int,</span>
+<span class="sd">          &quot;livro_id&quot;: int,</span>
+<span class="sd">          &quot;utilizador_id&quot;: int,</span>
+<span class="sd">          &quot;requisitante&quot;: str,</span>
+<span class="sd">          &quot;ativa&quot;: bool,</span>
+<span class="sd">          &quot;data_requisicao&quot;: &quot;YYYY-MM-DD&quot;,</span>
+<span class="sd">          &quot;data_limite&quot;: &quot;YYYY-MM-DD&quot;</span>
+<span class="sd">        }</span>
+
+<span class="sd">    Nota: podem existir registos antigos sem `utilizador_id` e/ou sem datas.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list[dict]: Lista de requisições (ativas e concluídas).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_garantir_ficheiro</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_DADOS</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_guardar_requisicoes</span><span class="p">(</span><span class="n">regs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Persiste a lista completa de requisições no ficheiro JSON.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        regs (list[dict]): Lista de requisições a gravar.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_DADOS</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">regs</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_proximo_id</span><span class="p">(</span><span class="n">regs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calcula o próximo identificador sequencial para uma requisição.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        regs (list[dict]): Lista de requisições.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Próximo identificador.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">regs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">regs</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+
+<div class="viewcode-block" id="contar_requisicoes_ativas_por_livro">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.contar_requisicoes_ativas_por_livro">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">contar_requisicoes_ativas_por_livro</span><span class="p">(</span><span class="n">livro_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conta quantas requisições ativas existem para um determinado livro.</span>
+
+<span class="sd">    Cada registo ativo corresponde a um exemplar emprestado.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        livro_id (int): Identificador do livro.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Número de exemplares atualmente em requisição.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">carregar_requisicoes</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;livro_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">livro_id</span> <span class="ow">and</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;ativa&quot;</span><span class="p">]</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="texto_tempo_restante_devolucao">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.texto_tempo_restante_devolucao">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">texto_tempo_restante_devolucao</span><span class="p">(</span><span class="n">data_limite_iso</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converte uma data limite (ISO) num texto amigável sobre o prazo.</span>
+
+<span class="sd">    Este helper existe para manter a lógica de apresentação consistente em</span>
+<span class="sd">    vários ecrãs/fluxos (listagens por utilizador e painel do administrador).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data_limite_iso (str | None): Data em formato ISO (`YYYY-MM-DD`) ou</span>
+<span class="sd">            `None`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Mensagem humana (dias restantes, último dia, ou atraso).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">data_limite_iso</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;Prazo não definido nesta requisição (registo antigo).&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">limite</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">data_limite_iso</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;Data limite inválida no registo.&quot;</span>
+    <span class="n">hoje</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">limite</span> <span class="o">-</span> <span class="n">hoje</span><span class="p">)</span><span class="o">.</span><span class="n">days</span>
+    <span class="n">limite_pt</span> <span class="o">=</span> <span class="n">limite</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Faltam </span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2"> dias até ao limite de devolução (</span><span class="si">{</span><span class="n">limite_pt</span><span class="si">}</span><span class="s2">).&quot;</span>
+    <span class="k">if</span> <span class="n">delta</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Falta 1 dia até ao limite de devolução (</span><span class="si">{</span><span class="n">limite_pt</span><span class="si">}</span><span class="s2">).&quot;</span>
+    <span class="k">if</span> <span class="n">delta</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Hoje é o último dia do prazo (</span><span class="si">{</span><span class="n">limite_pt</span><span class="si">}</span><span class="s2">).&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Em atraso há </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span><span class="si">}</span><span class="s2"> dia(s). Limite era </span><span class="si">{</span><span class="n">limite_pt</span><span class="si">}</span><span class="s2">.&quot;</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_linha_livro_com_disponibilidade</span><span class="p">(</span><span class="n">livro</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gera uma linha (multi-linha) para mostrar um livro e a sua disponibilidade.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        livro (dict): Livro (como devolvido por</span>
+<span class="sd">            `modulo_catalogo.carregar_livros`).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Texto formatado com título/autor/tema e um resumo do estado.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lid</span> <span class="o">=</span> <span class="n">livro</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+    <span class="n">disp</span> <span class="o">=</span> <span class="n">exemplares_disponiveis</span><span class="p">(</span><span class="n">lid</span><span class="p">)</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">livro</span><span class="p">[</span><span class="s2">&quot;exemplares&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">disp</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">estado</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Disponível — </span><span class="si">{</span><span class="n">disp</span><span class="si">}</span><span class="s2"> exemplar(es) livre(s) (de </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="k">elif</span> <span class="n">total</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">estado</span> <span class="o">=</span> <span class="s2">&quot;Sem exemplares no stock&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">estado</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Emprestado — os </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2"> exemplar(es) estão requisitados&quot;</span>
+    <span class="n">tema</span> <span class="o">=</span> <span class="n">livro</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tema&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">extra_tema</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; | Tema: </span><span class="si">{</span><span class="n">tema</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">tema</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;  [</span><span class="si">{</span><span class="n">lid</span><span class="si">}</span><span class="s2">] «</span><span class="si">{</span><span class="n">livro</span><span class="p">[</span><span class="s1">&#39;titulo&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">» — </span><span class="si">{</span><span class="n">livro</span><span class="p">[</span><span class="s1">&#39;autor&#39;</span><span class="p">]</span><span class="si">}{</span><span class="n">extra_tema</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;      </span><span class="si">{</span><span class="n">estado</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="catalogo_disponibilidade_formatado">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.catalogo_disponibilidade_formatado">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">catalogo_disponibilidade_formatado</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Devolve o catálogo completo com disponibilidade calculada.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Texto pronto a imprimir na consola.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">livros</span> <span class="o">=</span> <span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">carregar_livros</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">livros</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;(Catálogo vazio — ainda não existem livros registados.)&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_linha_livro_com_disponibilidade</span><span class="p">(</span><span class="n">livro</span><span class="p">)</span> <span class="k">for</span> <span class="n">livro</span> <span class="ow">in</span> <span class="n">livros</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="formatar_livros_com_disponibilidade">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.formatar_livros_com_disponibilidade">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">formatar_livros_com_disponibilidade</span><span class="p">(</span><span class="n">livros</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Formata uma lista de livros (subconjunto do catálogo) com disponibilidade.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        livros (list[dict]): Livros a formatar (como devolvidos por pesquisas).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Texto pronto a imprimir.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">livros</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;(Nenhum livro corresponde à pesquisa.)&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_linha_livro_com_disponibilidade</span><span class="p">(</span><span class="n">livro</span><span class="p">)</span> <span class="k">for</span> <span class="n">livro</span> <span class="ow">in</span> <span class="n">livros</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="exemplares_disponiveis">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.exemplares_disponiveis">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">exemplares_disponiveis</span><span class="p">(</span><span class="n">livro_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calcula quantos exemplares de um livro ainda podem ser requisitados.</span>
+
+<span class="sd">    A disponibilidade é calculada como:</span>
+<span class="sd">    `exemplares_total - requisições_ativas` (limitado a 0).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        livro_id (int): Identificador do livro.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Número de exemplares disponíveis (0 se o livro não existir).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">livro</span> <span class="o">=</span> <span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">obter_livro</span><span class="p">(</span><span class="n">livro_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">livro</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="n">em_uso</span> <span class="o">=</span> <span class="n">contar_requisicoes_ativas_por_livro</span><span class="p">(</span><span class="n">livro_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">livro</span><span class="p">[</span><span class="s2">&quot;exemplares&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">em_uso</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="requisitar">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.requisitar">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">requisitar</span><span class="p">(</span><span class="n">livro_id</span><span class="p">,</span> <span class="n">utilizador_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cria uma nova requisição ativa, se houver exemplar disponível.</span>
+
+<span class="sd">    Este método valida:</span>
+<span class="sd">    - existência do utilizador</span>
+<span class="sd">    - existência do livro</span>
+<span class="sd">    - disponibilidade (pelo menos 1 exemplar livre)</span>
+
+<span class="sd">    Em caso de sucesso, grava a requisição com datas (hoje e data limite).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        livro_id (int): Identificador do livro.</span>
+<span class="sd">        utilizador_id (int): Identificador do utilizador.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple[bool, str, dict | None]:</span>
+<span class="sd">            - sucesso (bool)</span>
+<span class="sd">            - mensagem (str) para apresentação</span>
+<span class="sd">            - registo da requisição (dict) ou `None` em caso de erro</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Import local para evitar dependência circular em tempo de import.</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">modulo_utilizadores</span>
+
+    <span class="n">utilizador</span> <span class="o">=</span> <span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">obter_utilizador</span><span class="p">(</span><span class="n">utilizador_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">utilizador</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;Utilizador não encontrado. Peça ao administrador o registo.&quot;</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">livro</span> <span class="o">=</span> <span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">obter_livro</span><span class="p">(</span><span class="n">livro_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">livro</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Livro não encontrado.&quot;</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">exemplares_disponiveis</span><span class="p">(</span><span class="n">livro_id</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Não há exemplares disponíveis para requisição.&quot;</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">regs</span> <span class="o">=</span> <span class="n">carregar_requisicoes</span><span class="p">()</span>
+    <span class="n">hoje</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+    <span class="n">limite</span> <span class="o">=</span> <span class="n">hoje</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">DIAS_PRAZO_EMPRESTIMO</span><span class="p">)</span>
+    <span class="n">reg</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">_proximo_id</span><span class="p">(</span><span class="n">regs</span><span class="p">),</span>
+        <span class="s2">&quot;livro_id&quot;</span><span class="p">:</span> <span class="n">livro_id</span><span class="p">,</span>
+        <span class="s2">&quot;utilizador_id&quot;</span><span class="p">:</span> <span class="n">utilizador_id</span><span class="p">,</span>
+        <span class="s2">&quot;requisitante&quot;</span><span class="p">:</span> <span class="n">utilizador</span><span class="p">[</span><span class="s2">&quot;nome&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;ativa&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;data_requisicao&quot;</span><span class="p">:</span> <span class="n">hoje</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="s2">&quot;data_limite&quot;</span><span class="p">:</span> <span class="n">limite</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+    <span class="p">}</span>
+    <span class="n">regs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reg</span><span class="p">)</span>
+    <span class="n">_guardar_requisicoes</span><span class="p">(</span><span class="n">regs</span><span class="p">)</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Requisição registada com sucesso. &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;Devolução até </span><span class="si">{</span><span class="n">limite</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">/%m/%Y&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">DIAS_PRAZO_EMPRESTIMO</span><span class="si">}</span><span class="s2"> dias).&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">reg</span></div>
+
+
+
+<div class="viewcode-block" id="devolver">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.devolver">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">devolver</span><span class="p">(</span><span class="n">requisicao_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Encerra uma requisição ativa (regista a devolução do exemplar).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        requisicao_id (int): Identificador da requisição.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple[bool, str]: Resultado da operação e mensagem.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">regs</span> <span class="o">=</span> <span class="n">carregar_requisicoes</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">regs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">requisicao_id</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;ativa&quot;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Esta requisição já estava concluída.&quot;</span>
+            <span class="n">r</span><span class="p">[</span><span class="s2">&quot;ativa&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">_guardar_requisicoes</span><span class="p">(</span><span class="n">regs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;Devolução registada.&quot;</span>
+    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Requisição não encontrada.&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="listar_requisitadas_admin">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.listar_requisitadas_admin">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">listar_requisitadas_admin</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lista requisições ativas para o administrador.</span>
+
+<span class="sd">    Inclui:</span>
+<span class="sd">    - identificador da requisição</span>
+<span class="sd">    - título do livro</span>
+<span class="sd">    - nome do requisitante</span>
+<span class="sd">    - exemplares ainda disponíveis para terceiros</span>
+<span class="sd">    - data limite (se existir e for válida)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Texto formatado para consola.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ativas</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">carregar_requisicoes</span><span class="p">()</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;ativa&quot;</span><span class="p">]]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ativas</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;(Não existem requisições ativas.)&quot;</span>
+    <span class="n">linhas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ativas</span><span class="p">:</span>
+        <span class="n">livro</span> <span class="o">=</span> <span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">obter_livro</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;livro_id&quot;</span><span class="p">])</span>
+        <span class="n">titulo</span> <span class="o">=</span> <span class="n">livro</span><span class="p">[</span><span class="s2">&quot;titulo&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">livro</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;(id </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;livro_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> desconhecido)&quot;</span>
+        <span class="n">disp</span> <span class="o">=</span> <span class="n">exemplares_disponiveis</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;livro_id&quot;</span><span class="p">])</span>
+        <span class="n">prazo</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_limite&quot;</span><span class="p">)</span>
+        <span class="n">linha_prazo</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">prazo</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">linha_prazo</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">    Devolução até: &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">date</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">prazo</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">/%m/%Y&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="n">linhas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;  Requisição #</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: «</span><span class="si">{</span><span class="n">titulo</span><span class="si">}</span><span class="s2">» — </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;requisitante&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;    Exemplares ainda disponíveis para outros: </span><span class="si">{</span><span class="n">disp</span><span class="si">}{</span><span class="n">linha_prazo</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">linhas</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="requisicao_pertence_a_utilizador">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.requisicao_pertence_a_utilizador">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">requisicao_pertence_a_utilizador</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">utilizador_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Valida se uma requisição pertence a um utilizador.</span>
+
+<span class="sd">    A regra preferencial é por `utilizador_id`. Para compatibilidade com</span>
+<span class="sd">    registos antigos (legados), se `utilizador_id` não existir no registo,</span>
+<span class="sd">    valida por nome (`requisitante`).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        reg (dict): Registo de requisição.</span>
+<span class="sd">        utilizador_id (int): Identificador do utilizador.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: `True` se a requisição pertencer ao utilizador.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Alguns registos antigos podem não ter `utilizador_id`, apenas nome.</span>
+    <span class="n">uid</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;utilizador_id&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">uid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">uid</span> <span class="o">==</span> <span class="n">utilizador_id</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">modulo_utilizadores</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="n">modulo_utilizadores</span><span class="o">.</span><span class="n">obter_utilizador</span><span class="p">(</span><span class="n">utilizador_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">reg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;requisitante&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;nome&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="prazos_minhas_requisicoes_formatado">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.prazos_minhas_requisicoes_formatado">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prazos_minhas_requisicoes_formatado</span><span class="p">(</span><span class="n">utilizador_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lista requisições ativas do utilizador e descreve o prazo de devolução.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        utilizador_id (int): Identificador do utilizador.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Texto formatado para consola.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ativas</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">r</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">carregar_requisicoes</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;ativa&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">requisicao_pertence_a_utilizador</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">utilizador_id</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ativas</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;(Sem requisições ativas.)&quot;</span>
+    <span class="n">linhas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ativas</span><span class="p">:</span>
+        <span class="n">livro</span> <span class="o">=</span> <span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">obter_livro</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;livro_id&quot;</span><span class="p">])</span>
+        <span class="n">titulo</span> <span class="o">=</span> <span class="n">livro</span><span class="p">[</span><span class="s2">&quot;titulo&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">livro</span> <span class="k">else</span> <span class="s2">&quot;?&quot;</span>
+        <span class="n">linhas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [#</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">] «</span><span class="si">{</span><span class="n">titulo</span><span class="si">}</span><span class="s2">»&quot;</span><span class="p">)</span>
+        <span class="n">linhas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;      </span><span class="si">{</span><span class="n">texto_tempo_restante_devolucao</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_limite&#39;</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">linhas</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="listar_por_utilizador">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.listar_por_utilizador">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">listar_por_utilizador</span><span class="p">(</span><span class="n">utilizador_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lista requisições ativas de um utilizador (para escolher devolução).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        utilizador_id (int): Identificador do utilizador.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Texto formatado para consola.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ativas</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">r</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">carregar_requisicoes</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;ativa&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">requisicao_pertence_a_utilizador</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">utilizador_id</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ativas</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;(Sem requisições ativas para este utilizador.)&quot;</span>
+    <span class="n">linhas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ativas</span><span class="p">:</span>
+        <span class="n">livro</span> <span class="o">=</span> <span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">obter_livro</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;livro_id&quot;</span><span class="p">])</span>
+        <span class="n">titulo</span> <span class="o">=</span> <span class="n">livro</span><span class="p">[</span><span class="s2">&quot;titulo&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">livro</span> <span class="k">else</span> <span class="s2">&quot;?&quot;</span>
+        <span class="n">linhas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [#</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">] «</span><span class="si">{</span><span class="n">titulo</span><span class="si">}</span><span class="s2">»&quot;</span><span class="p">)</span>
+        <span class="n">linhas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      </span><span class="si">{</span><span class="n">texto_tempo_restante_devolucao</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_limite&#39;</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">linhas</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="resumo_requisicoes_utilizador">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.resumo_requisicoes_utilizador">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">resumo_requisicoes_utilizador</span><span class="p">(</span><span class="n">utilizador_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gera um resumo textual das requisições de um utilizador.</span>
+
+<span class="sd">    Inclui contagens de requisições ativas e concluídas e, se existirem</span>
+<span class="sd">    requisições ativas, lista-as com o respetivo prazo.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        utilizador_id (int): Identificador do utilizador.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Texto formatado para a consola.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># O resumo é consumido pelo módulo de utilizadores (ficha de utilizador).</span>
+    <span class="n">regs</span> <span class="o">=</span> <span class="n">carregar_requisicoes</span><span class="p">()</span>
+    <span class="n">todas</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">regs</span> <span class="k">if</span> <span class="n">requisicao_pertence_a_utilizador</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">utilizador_id</span><span class="p">)]</span>
+    <span class="n">ativas</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">todas</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;ativa&quot;</span><span class="p">]]</span>
+    <span class="n">concluidas</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">todas</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;ativa&quot;</span><span class="p">]]</span>
+
+    <span class="n">linhas</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="sa">f</span><span class="s2">&quot;    Requisições ativas: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ativas</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;    Requisições concluídas (histórico): </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">concluidas</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">ativas</span><span class="p">:</span>
+        <span class="n">linhas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;    Em requisição:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ativas</span><span class="p">:</span>
+            <span class="n">livro</span> <span class="o">=</span> <span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">obter_livro</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;livro_id&quot;</span><span class="p">])</span>
+            <span class="n">tit</span> <span class="o">=</span> <span class="n">livro</span><span class="p">[</span><span class="s2">&quot;titulo&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">livro</span> <span class="k">else</span> <span class="s2">&quot;?&quot;</span>
+            <span class="n">linhas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      — «</span><span class="si">{</span><span class="n">tit</span><span class="si">}</span><span class="s2">» (#</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="n">linhas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;        </span><span class="si">{</span><span class="n">texto_tempo_restante_devolucao</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_limite&#39;</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">linhas</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="listar_stock_por_livro_formatado">
+<a class="viewcode-back" href="../modulo_requisicoes.html#modulo_requisicoes.listar_stock_por_livro_formatado">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">listar_stock_por_livro_formatado</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Formata um relatório de stock por livro.</span>
+
+<span class="sd">    Para cada livro apresenta:</span>
+<span class="sd">    - stock total no catálogo</span>
+<span class="sd">    - quantos exemplares estão em requisição (requisições ativas)</span>
+<span class="sd">    - quantos exemplares estão disponíveis</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Texto pronto a imprimir na consola.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">livros</span> <span class="o">=</span> <span class="n">modulo_catalogo</span><span class="o">.</span><span class="n">carregar_livros</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">livros</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;(Sem livros no catálogo.)&quot;</span>
+    <span class="n">linhas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">livro</span> <span class="ow">in</span> <span class="n">livros</span><span class="p">:</span>
+        <span class="n">lid</span> <span class="o">=</span> <span class="n">livro</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">livro</span><span class="p">[</span><span class="s2">&quot;exemplares&quot;</span><span class="p">]</span>
+        <span class="n">em_req</span> <span class="o">=</span> <span class="n">contar_requisicoes_ativas_por_livro</span><span class="p">(</span><span class="n">lid</span><span class="p">)</span>
+        <span class="n">disp</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">total</span> <span class="o">-</span> <span class="n">em_req</span><span class="p">)</span>
+        <span class="n">linhas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;  [</span><span class="si">{</span><span class="n">lid</span><span class="si">}</span><span class="s2">] «</span><span class="si">{</span><span class="n">livro</span><span class="p">[</span><span class="s1">&#39;titulo&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">»</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;      Stock total: </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2"> | Em requisição: </span><span class="si">{</span><span class="n">em_req</span><span class="si">}</span><span class="s2"> | Disponível: </span><span class="si">{</span><span class="n">disp</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">linhas</span><span class="p">)</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Pesquisa rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice Geral"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Código do módulo</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">modulo_requisicoes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TP2 ADC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

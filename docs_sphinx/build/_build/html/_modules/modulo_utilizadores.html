@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html lang="pt" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>modulo_utilizadores &#8212; Documentação Biblioteca TP2 </title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/nature.css?v=279e0f84" />
+    <script src="../_static/documentation_options.js?v=103ffe9a"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/translations.js?v=beaedd51"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Pesquisar" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice Geral"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Código do módulo</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">modulo_utilizadores</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Código fonte de modulo_utilizadores</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Gestão de utilizadores (persistência em JSON).</span>
+
+<span class="sd">Este módulo concentra operações CRUD simples para utilizadores da aplicação.</span>
+<span class="sd">A persistência é feita num ficheiro JSON dentro da pasta `data/` do projeto.</span>
+
+<span class="sd">Estrutura esperada por registo de utilizador::</span>
+
+<span class="sd">    {</span>
+<span class="sd">      &quot;id&quot;: int,</span>
+<span class="sd">      &quot;nome&quot;: str,</span>
+<span class="sd">      &quot;email&quot;: str,</span>
+<span class="sd">      &quot;telefone&quot;: str</span>
+<span class="sd">    }</span>
+
+<span class="sd">As funções deste módulo são chamadas pelo `main.py` e por outros módulos</span>
+<span class="sd">(ex.: `modulo_requisicoes`) para validar identidades e apresentar fichas.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># Caminho para o ficheiro de dados de utilizadores.</span>
+<span class="n">_DADOS</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;utilizadores.json&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_garantir_ficheiro</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Garante que a pasta e o ficheiro JSON de utilizadores existem.</span>
+
+<span class="sd">    Esta função é um detalhe interno de persistência. Se o ficheiro ainda não</span>
+<span class="sd">    existir, cria-o com uma lista vazia (`[]`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_DADOS</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_DADOS</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">_DADOS</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;[]&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="carregar_utilizadores">
+<a class="viewcode-back" href="../modulo_utilizadores.html#modulo_utilizadores.carregar_utilizadores">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">carregar_utilizadores</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Carrega todos os utilizadores a partir do ficheiro JSON.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list[dict]: Lista de utilizadores (cada um representado por um</span>
+<span class="sd">        dicionário com as chaves `id`, `nome`, `email`, `telefone`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_garantir_ficheiro</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_DADOS</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_guardar_utilizadores</span><span class="p">(</span><span class="n">regs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Guarda a lista completa de utilizadores no ficheiro JSON.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        regs (list[dict]): Lista de utilizadores a persistir.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_DADOS</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">regs</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_proximo_id</span><span class="p">(</span><span class="n">regs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calcula o próximo identificador sequencial para um utilizador.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        regs (list[dict]): Lista atual de utilizadores.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: O próximo `id` (1 se a lista estiver vazia).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">regs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">regs</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+
+<div class="viewcode-block" id="adicionar_utilizador">
+<a class="viewcode-back" href="../modulo_utilizadores.html#modulo_utilizadores.adicionar_utilizador">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">adicionar_utilizador</span><span class="p">(</span><span class="n">nome</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">telefone</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Regista um novo utilizador.</span>
+
+<span class="sd">    Valida o nome (obrigatório), normaliza os campos (trim) e persiste o</span>
+<span class="sd">    registo no ficheiro JSON.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        nome (str): Nome completo do utilizador. Campo obrigatório.</span>
+<span class="sd">        email (str): Endereço de e-mail (opcional).</span>
+<span class="sd">        telefone (str): Contacto telefónico (opcional).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dicionário do utilizador criado (inclui `id`).</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: Se `nome` estiver vazio após `strip()`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nome</span> <span class="o">=</span> <span class="n">nome</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nome</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;O nome é obrigatório.&quot;</span><span class="p">)</span>
+    <span class="n">regs</span> <span class="o">=</span> <span class="n">carregar_utilizadores</span><span class="p">()</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">_proximo_id</span><span class="p">(</span><span class="n">regs</span><span class="p">),</span>
+        <span class="s2">&quot;nome&quot;</span><span class="p">:</span> <span class="n">nome</span><span class="p">,</span>
+        <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">email</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+        <span class="s2">&quot;telefone&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">telefone</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+    <span class="p">}</span>
+    <span class="n">regs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+    <span class="n">_guardar_utilizadores</span><span class="p">(</span><span class="n">regs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">u</span></div>
+
+
+
+<div class="viewcode-block" id="obter_utilizador">
+<a class="viewcode-back" href="../modulo_utilizadores.html#modulo_utilizadores.obter_utilizador">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">obter_utilizador</span><span class="p">(</span><span class="n">utilizador_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtém um utilizador pelo seu identificador.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        utilizador_id (int): Identificador do utilizador.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict | None: O dicionário do utilizador se existir; caso contrário</span>
+<span class="sd">        `None`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">carregar_utilizadores</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">utilizador_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">u</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="atualizar_contactos">
+<a class="viewcode-back" href="../modulo_utilizadores.html#modulo_utilizadores.atualizar_contactos">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">atualizar_contactos</span><span class="p">(</span><span class="n">utilizador_id</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">telefone</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Atualiza e persiste os contactos (e-mail e telefone) de um utilizador.</span>
+
+<span class="sd">    Os valores são normalizados com `strip()`. O chamador pode passar string</span>
+<span class="sd">    vazia para remover um contacto.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        utilizador_id (int): Identificador do utilizador.</span>
+<span class="sd">        email (str): Novo e-mail (ou vazio para remover).</span>
+<span class="sd">        telefone (str): Novo telefone (ou vazio para remover).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple[bool, str]:</span>
+<span class="sd">            - `True` e mensagem de sucesso se o utilizador existir.</span>
+<span class="sd">            - `False` e mensagem de erro se não existir.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="p">(</span><span class="n">email</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">telefone</span> <span class="o">=</span> <span class="p">(</span><span class="n">telefone</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">regs</span> <span class="o">=</span> <span class="n">carregar_utilizadores</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">regs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">utilizador_id</span><span class="p">:</span>
+            <span class="n">u</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">email</span>
+            <span class="n">u</span><span class="p">[</span><span class="s2">&quot;telefone&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">telefone</span>
+            <span class="n">_guardar_utilizadores</span><span class="p">(</span><span class="n">regs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;E-mail e telemóvel atualizados com sucesso.&quot;</span>
+    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Utilizador não encontrado.&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="listar_indice_formatado">
+<a class="viewcode-back" href="../modulo_utilizadores.html#modulo_utilizadores.listar_indice_formatado">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">listar_indice_formatado</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lista simples (id + nome) para mostrar na consola.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Texto formatado com um utilizador por linha.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">regs</span> <span class="o">=</span> <span class="n">carregar_utilizadores</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">regs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;(Ainda não existem utilizadores registados.)&quot;</span>
+    <span class="n">linhas</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;  [</span><span class="si">{</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;nome&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">regs</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">linhas</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ficha_formatada">
+<a class="viewcode-back" href="../modulo_utilizadores.html#modulo_utilizadores.ficha_formatada">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ficha_formatada</span><span class="p">(</span><span class="n">utilizador_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gera uma &#39;ficha&#39; de utilizador com contactos e resumo de requisições.</span>
+
+<span class="sd">    Esta função agrega informação de `modulo_requisicoes` para apresentar um</span>
+<span class="sd">    resumo de requisições ativas e histórico.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        utilizador_id (int): Identificador do utilizador.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Texto pronto a imprimir na consola.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">obter_utilizador</span><span class="p">(</span><span class="n">utilizador_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;Utilizador não encontrado.&quot;</span>
+
+    <span class="kn">import</span><span class="w"> </span><span class="nn">modulo_requisicoes</span>
+
+    <span class="n">resumo</span> <span class="o">=</span> <span class="n">modulo_requisicoes</span><span class="o">.</span><span class="n">resumo_requisicoes_utilizador</span><span class="p">(</span><span class="n">utilizador_id</span><span class="p">)</span>
+
+    <span class="n">linhas</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="sa">f</span><span class="s2">&quot;  Id: </span><span class="si">{</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;  Nome: </span><span class="si">{</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;nome&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;  E-mail: </span><span class="si">{</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;—&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;  Telefone: </span><span class="si">{</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;telefone&#39;</span><span class="p">]</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;—&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;  Requisições:&quot;</span><span class="p">,</span>
+        <span class="n">resumo</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">linhas</span><span class="p">)</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Pesquisa rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegação</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice Geral"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos do Python"
+             >módulos</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Documentação Biblioteca TP2 </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Código do módulo</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">modulo_utilizadores</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TP2 ADC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>
