@@ -8,10 +8,15 @@ e para qualquer perfil listar os livros disponíveis para consulta.
 import json
 from pathlib import Path
 
+# Caminho para o ficheiro JSON do catálogo.
 _DADOS = Path(__file__).resolve().parent.parent / "data" / "livros.json"
 
 
 def _garantir_ficheiro():
+    """Garante que a pasta e o ficheiro JSON do catálogo existem.
+
+    Se o ficheiro ainda não existir, é criado com uma lista vazia (`[]`).
+    """
     _DADOS.parent.mkdir(parents=True, exist_ok=True)
     if not _DADOS.exists():
         _DADOS.write_text("[]", encoding="utf-8")
@@ -21,18 +26,36 @@ def carregar_livros():
     """
     Carrega todos os livros do ficheiro de dados.
 
-    :return: Lista de dicionários com id, titulo, autor, exemplares e opcionalmente tema
-    :rtype: list[dict]
+    Returns:
+        list[dict]: Lista de livros, onde cada livro contém:
+            - `id` (int)
+            - `titulo` (str)
+            - `autor` (str)
+            - `exemplares` (int)
+            - `tema` (str, opcional)
     """
     _garantir_ficheiro()
     return json.loads(_DADOS.read_text(encoding="utf-8"))
 
 
 def _guardar_livros(livros):
+    """Persiste a lista completa de livros no ficheiro JSON.
+
+    Args:
+        livros (list[dict]): Lista de livros a gravar.
+    """
     _DADOS.write_text(json.dumps(livros, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def _proximo_id(livros):
+    """Calcula o próximo identificador sequencial para um livro.
+
+    Args:
+        livros (list[dict]): Lista atual de livros.
+
+    Returns:
+        int: O próximo `id` (1 se a lista estiver vazia).
+    """
     if not livros:
         return 1
     return max(l["id"] for l in livros) + 1
@@ -42,12 +65,14 @@ def adicionar_livro(titulo, autor, exemplares, tema=""):
     """
     Regista um novo livro no catálogo.
 
-    :param titulo: Título do livro
-    :param autor: Nome do autor
-    :param exemplares: Número de exemplares físicos (>= 1)
-    :param tema: Tema ou género (opcional), usado na pesquisa
-    :return: O dicionário do livro criado
-    :rtype: dict
+    Args:
+        titulo (str): Título do livro.
+        autor (str): Nome do autor.
+        exemplares (int): Número de exemplares físicos (>= 1).
+        tema (str): Tema ou género (opcional), usado na pesquisa.
+
+    Returns:
+        dict: O dicionário do livro criado e persistido.
     """
     livros = carregar_livros()
     livro = {
