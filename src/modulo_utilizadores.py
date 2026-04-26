@@ -116,7 +116,21 @@ def obter_utilizador(utilizador_id):
 
 
 def atualizar_contactos(utilizador_id, email, telefone):
+    """Atualiza e persiste os contactos (e-mail e telefone) de um utilizador.
 
+    Os valores são normalizados com `strip()`. O chamador pode passar string
+    vazia para remover um contacto.
+
+    Args:
+        utilizador_id (int): Identificador do utilizador.
+        email (str): Novo e-mail (ou vazio para remover).
+        telefone (str): Novo telefone (ou vazio para remover).
+
+    Returns:
+        tuple[bool, str]:
+            - `True` e mensagem de sucesso se o utilizador existir.
+            - `False` e mensagem de erro se não existir.
+    """
     email = (email or "").strip()
     telefone = (telefone or "").strip()
     regs = carregar_utilizadores()
@@ -130,7 +144,11 @@ def atualizar_contactos(utilizador_id, email, telefone):
 
 
 def listar_indice_formatado():
+    """Lista simples (id + nome) para mostrar na consola.
 
+    Returns:
+        str: Texto formatado com um utilizador por linha.
+    """
     regs = carregar_utilizadores()
     if not regs:
         return "(Ainda não existem utilizadores registados.)"
@@ -139,7 +157,17 @@ def listar_indice_formatado():
 
 
 def ficha_formatada(utilizador_id):
+    """Gera uma 'ficha' de utilizador com contactos e resumo de requisições.
 
+    Esta função agrega informação de `modulo_requisicoes` para apresentar um
+    resumo de requisições ativas e histórico.
+
+    Args:
+        utilizador_id (int): Identificador do utilizador.
+
+    Returns:
+        str: Texto pronto a imprimir na consola.
+    """
     u = obter_utilizador(utilizador_id)
     if u is None:
         return "Utilizador não encontrado."
